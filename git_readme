@@ -1,0 +1,21 @@
+Repository Access:
+ 
+Project members with either the Manager or Developer role can check out and commit to the repository using one of two methods.
+ 
+Method 1: https access
+
+Clone using
+
+`git clone https://username@projects.cecs.pdx.edu/git/project_identifier`
+
+You will be asked for your MCECS username and password.
+ 
+Method 2: ssh key access
+
+Go to Intranet (https://intranet.cecs.pdx.edu/projects/keys/). Here you can add ssh public keys for repository access. You will be notified once they are added and you can checkout the repository using
+
+Clone using
+
+`git clone git@projects.cecs.pdx.edu:project_identifier.git`
+
+You will be asked for your ssh key passphrase.
