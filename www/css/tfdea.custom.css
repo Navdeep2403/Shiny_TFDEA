@@ -1,0 +1,40 @@
+h3, h5, h6 {
+ color: steelblue; 
+}
+h5 {
+  text-decoration:underline
+}
+body {
+ /*background : lightgrey;*/ 
+}
+.btn {
+ color:green; 
+ border-color:black;
+}
+.table tfoot {
+  display: none;
+}
+.table {
+  border: 1px solid black; 
+}
+.table td, .table th { 
+  text-align: center;  
+}
+
+/*#table_lr_summary, #table_tfdea_summary { 
+  height : 70px; 
+}
+#table_summary { 
+  height : 70px; 
+}
+#table_lr_coeff, #table_lr_mc { 
+  height : 150px; 
+}*/
+.textarea { 
+  width: 95%; 
+}
+/*.jqplot-highlighter { 
+  background-color: lightblue; 
+  color: black;
+  font-size: x-small;
+}*/
