@@ -35,7 +35,7 @@ shinyServer(function(input, output, session) {
                                   local = input$data.file,
                                   google = input$gs.url,
                                   dropbox = input$dropbox.url)
-          
+    
           # Load data from selected location and parameters (location: functions.R)
           df <- data.load(input$fsource, data.location, input$col.header, input$row.header, 
                           input$file.sep, input$file.quote)

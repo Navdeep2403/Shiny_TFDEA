@@ -27,7 +27,10 @@ library(ggvis)              # Required for plotting results
 options(shiny.maxRequestSize=10*1024^2) # set the maximum upload file size to 10MB.
 
 # List of options for accessing and reading the data  (used in ui.R)
-file.source.opts <- list('Google Spreadsheet' = 'google', Local = 'local', Dropbox = 'dropbox')
+#file.source.opts <- list('Google Spreadsheet' = 'google', Local = 'local', Dropbox = 'dropbox')
+
+# disable upload from google and dropbox function
+file.source.opts <- list(Local = 'local')
 file.sep.opts <- list(Comma = ',', Semicolon = ';', Tab = '\t')
 # file.quote.opts <- list(None = 'none', 'Single Quote' = 'single', 'Double Quote' = 'double')
 file.quote.opts <- list(None = '', 'Single Quote' = "'", 'Double Quote' = '"')
@@ -35,8 +38,8 @@ accepted.files <- c('.csv','text/csv', 'text/comma-separated-values','text/plain
 
 # Default URL for dropbox and google spreadsheet files when app loads. Links are currently for Fighter jet data
 # (used in ui.R)
-dropbox.default <- 'https://dl.dropboxusercontent.com/u/114755843/Martino_data.csv'
-gs.default <- 'https://docs.google.com/a/pdx.edu/spreadsheet/ccc?key=0Ah3jpDcVSUVpdFlIdWNzV2NmVHJ5bFQxcXZ5MnBNNnc#gid=0'
+#dropbox.default <- 'https://dl.dropboxusercontent.com/u/114755843/Martino_data.csv'
+#gs.default <- 'https://docs.google.com/a/pdx.edu/spreadsheet/ccc?key=0Ah3jpDcVSUVpdFlIdWNzV2NmVHJ5bFQxcXZ5MnBNNnc#gid=0'
 
 # List of options for TFDEA analysis (used in ui.R)
 orientation.opts <- list(Output = 'out', Input = 'in')
