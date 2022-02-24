@@ -27,7 +27,9 @@ shinyUI(pageWithSidebar(
     tabsetPanel(id="ts.setup",
                 tabPanel("1.Upload File", value="ts.setup.upload",
                          #selectInput('fsource', 'File Source:', file.source.opts),
-                         selectInput('fsource', 'File Source:', 'local'),
+                         selectInput('fsource', 'File Source:',
+                                     # list(Local='local', 'Google Spreadsheet'='google'), 'Local'),
+                                     list(Local='local', 'Google Spreadsheet'='google', Dropbox='dropbox'), 'Local'),
                          
                          # This panel will only display when the local option has been selected for File Source
                          conditionalPanel(
@@ -35,23 +37,23 @@ shinyUI(pageWithSidebar(
                            fileInput('data.file', 'Choose CSV File:', accept= accepted.files)
                          ),                         
                          # This panel will only display when the google option has been selected for File Source
-                         #conditionalPanel(
-                           #condition = "input.fsource == 'google'",
-                           #HTML("<ol><li><a href = 'https://docs.google.com/spreadsheet' target = '_blank'>If required, 
-                                #click here to create new Google Spreadsheet:</a></li><li>Share the Google Spreadsheet, 
-                                #then copy the URL into the text area below:</li></ol>"),
-                           #tags$textarea(id='gs.url', rows=3, cols=40, class="textarea", 
-                                         #placeholder=gs.default, required=TRUE, gs.default)
-                         #),
+                         conditionalPanel(
+                           condition = "input.fsource == 'google'",
+                           HTML("<ol><li><a href = 'https://docs.google.com/spreadsheet' target = '_blank'>If required,
+                                click here to create new Google Spreadsheet:</a></li><li>Share the Google Spreadsheet,
+                                then copy the URL into the text area below:</li></ol>"),
+                           tags$textarea(id='gs.url', rows=3, cols=40, class="textarea",
+                                          placeholder=gs.default, required=TRUE, gs.default)
+                         ),
 
                          # This panel will only display when the dropbox option has been selected  for File Source
-                         #conditionalPanel(
-                           #condition = "input.fsource == 'dropbox'",
-                           #HTML("Copy the Dropbox URL (including http(s)) into the textboxes below:"),
-                           #br(),
-                           #tags$textarea(id='dropbox.url', class="textarea", rows=2, cols=40, 
-                                         #placeholder = dropbox.default, required=TRUE, dropbox.default)
-                         #),
+                         conditionalPanel(
+                           condition = "input.fsource == 'dropbox'",
+                           HTML("Copy the Dropbox URL (including http(s)) into the textboxes below:"),
+                           br(),
+                           tags$textarea(id='dropbox.url', class="textarea", rows=2, cols=40,
+                                         placeholder = dropbox.default, required=TRUE, dropbox.default)
+                         ),
 
                          # This panel will only display when the dropbox or local option has been selected 
                          conditionalPanel(

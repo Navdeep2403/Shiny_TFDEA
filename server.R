@@ -10,10 +10,212 @@ shinyServer(function(input, output, session) {
   
   # Loads external R files
   source("R/server.vars.R", local=TRUE)$value # Variables used among reactive expressions and functions in server.R 
-  source("R/tables.R", local=TRUE)$value      # Sortable datatables displaying data and results
+  # source("R/tables.R", local=TRUE)$value      # Sortable datatables displaying data and results
   source("R/plots.R", local=TRUE)$value       # Plots displaying the results
   source("R/functions.R", local=TRUE)$value   # Functions used throughout the server code
-  source("R/io.R", local=TRUE)$value          # Creates new inputs and download buttons using renderUI 
+  # source("R/io.R", local=TRUE)$value          # Creates new inputs and download buttons using renderUI 
+  
+  
+  output$frontier.date <- renderUI({
+    
+    # Get data and the current intro date
+    df <- get.df()
+    intro.date <- get.intro.date() 
+    
+    # If an introduction date column has been selected then set the lower and upper bound,
+    # and the current value to 0.7 x the difference between min and max years
+    if (intro.date != 'NONE'){
+      intro.dates <- df[, intro.date]
+      value <- floor((max(intro.dates) - min (intro.dates)) * 0.7) + min(intro.dates)
+      
+      numericInput('front.date', 'Select Frontier Year:', min = min(intro.dates), 
+                   max = max(intro.dates), value = value)
+    }
+    else
+      numericInput('front.date', 'Select Frontier Year:', 0, min = 0, max = 0)
+  })
+  
+  
+  # Shows download button after TFDEA analysis
+  output$btn.tfdea <- renderUI({
+    if (length(get.result()$tfdea) != 0)
+      downloadButton('btn.down.tfdea', 'Download Results')
+  })
+  
+  
+  # Saves TFDEA results to csv file when button pressed
+  output$btn.down.tfdea <- downloadHandler(
+    filename = function() {
+      paste0('tfdearesults-', Sys.Date(), '.xls')
+    },
+    content = function(file) {
+      df <- get.result()$tfdea
+      tryCatch(
+        WriteXLS('df', file, row.names = TRUE, AdjWidth = TRUE, 
+                 BoldHeaderRow = TRUE, verbose = TRUE),
+        error = function(e) { set.error(paste("Error downloading results to xls file:", e)) 
+          return(NULL) })
+    },
+    contentType = "application/vnd.ms-excel"
+  )
+  
+  
+  # Shows download button after LR analysis
+  output$btn.lr <- renderUI({
+    if (length(get.result()$lr) != 0)
+      downloadButton('btn.down.lr', 'Download Results')
+  })
+  
+  
+  # Saves LR results to csv file when button pressed
+  output$btn.down.lr <- downloadHandler(
+    filename = function() {
+      paste0('lrresults-', Sys.Date(), '.xls')
+    },
+    content = function(file) {
+      df <- get.result()$lr
+      tryCatch(
+        WriteXLS('df', file, row.names = TRUE, AdjWidth = TRUE, 
+                 BoldHeaderRow = TRUE, verbose = TRUE),
+        error = function(e) { set.error(paste("Error downloading results to xls file:", e)) 
+          return(NULL) })
+    },
+    contentType = "application/vnd.ms-excel"
+  )
+  
+  
+  
+  output$dt.data <- renderDataTable({
+    
+    df <- get.df()
+    if (nrow(df) == 0)
+      return(NULL)
+    
+    table <- df # data.frame that will be displayed in the table
+    
+    # Arrange data that will be displayed in the table. renderDataTable does not show row 
+    # names, so need to append row names
+    row.nums <- seq(nrow(table))
+    table <- cbind(row.nums, row.names(table), table)
+    names(table) <- c("ROW", "DMU",  toupper(names(df)))
+    return(table)
+  }, options = list(searching=TRUE, ordering=TRUE, processing=0,
+                    lengthMenu = c(10, 20, 30), pageLength = 10))
+  
+  
+  # Display a summary of all results
+  output$dt.summary <- renderDataTable({
+    result <- get.result()
+    if (length(result$tfdea) == 0)
+      return(NULL)
+    
+    if (length(result$lr) == 0) 
+      lr.mad <- NA
+    else                            
+      lr.mad <- result$lr$summary[1]
+    
+    table <- cbind(result$tfdea$summary[1], lr.mad)
+    table <- format(table, nsmall = 3)
+    names(table) <- c("MAD (TFDEA)", "MAD (LR)")
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    paging = FALSE, info = FALSE))
+  
+  
+  # Display summary of TFDEA results
+  output$dt.tfdea.summary <- renderDataTable({
+    result <- get.result()
+    if (length(result$tfdea) == 0)
+      return(NULL)
+    
+    table <- result$tfdea$summary
+    table <- format(table, nsmall = 3)
+    names(table) <- toupper(colnames(table))
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    paging = FALSE, info = FALSE))
+  
+  
+  # Display TFDEA forecast results
+  output$dt.tfdea.forecast <- renderDataTable({
+    df <- get.df()
+    result <- get.result()
+    if (length(result$tfdea) == 0)
+      return(NULL)
+    
+    table <- result$tfdea$forecast
+    table <- format(table, nsmall = 3)
+    
+    # renderDataTable does not show row names or numbers, so need to append both
+    table <- cbind(seq(nrow(df)), rownames(table), table) 
+    names(table) <- c("ROW", "DMU", toupper(names(result$tfdea$forecast))) 
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    lengthMenu = c(10, 20, 30), pageLength = 10))
+  
+  
+  
+  # Display summary of linear regression results 
+  output$dt.lr.summary <- renderDataTable({
+    result <- get.result()
+    if (length(result$lr) == 0)
+      return(NULL)
+    
+    table <- result$lr$summary
+    table <- format(table, nsmall = 3)
+    names(table) <- toupper(colnames(table))
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    paging = FALSE, info = FALSE))
+  
+  
+  # Display linear regression coefficients
+  output$dt.lr.coeff <- renderDataTable({
+    result <- get.result()
+    if (length(result$lr) == 0)
+      return(NULL)
+    
+    table <- result$lr$coefficients
+    table <- format(table, nsmall = 3)
+    table <- cbind(row.names(table), table)
+    names(table) <- c("COEFFICIENTS", toupper(names(result$lr$coefficients))) 
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    paging = FALSE, info = FALSE))
+  
+  
+  # Display linear regression multi-collinearity results
+  output$dt.lr.mc <- renderDataTable({
+    result <- get.result()
+    if (length(result$lr$mc) == 0)
+      return(NULL)
+    
+    table <- result$lr$mc
+    table <- format(table, nsmall = 3)
+    table <- cbind(row.names(table), table)
+    names(table) <- c("COEFFICIENTS", toupper(names(result$lr$mc))) 
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    paging = FALSE, info = FALSE))
+  
+  
+  
+  # Display linear regression forecast results
+  output$dt.lr.forecast <- renderDataTable({
+    df <- get.df()
+    result <- get.result()
+    if (length(result$lr) == 0)
+      return(NULL)
+    
+    table <- result$lr$forecast
+    table <- format(table, nsmall = 3)
+    
+    # renderDataTable does not show row names or numbers, so need to append both
+    table <- cbind(seq(nrow(df)), rownames(table), table)
+    names(table) <- c("ROW", "DMU", toupper(names(result$lr$forecast))) 
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    lengthMenu = c(10, 20, 30), pageLength = 10))
   
   # Observers monitor when the action buttons are pressed or a reactive value changes
   

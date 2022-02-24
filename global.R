@@ -11,7 +11,7 @@ if (length(setdiff(packages, installed.packages())) > 0)
 
 # Install required packages not part of cran
 if (!"shinyIncubator" %in% installed.packages())
-  devtools::install_github("shiny-incubator", "rstudio")
+  devtools::install_github("rstudio/shiny-incubator")
 
 library(shiny)              # Required for the Shiny application
 library(shinyIncubator)     # Required for additional Shiny options
@@ -20,6 +20,7 @@ library(TFDEA)              # Required for TFDEA analysis
 library(WriteXLS)           # Required for Writing results to an XLS spreadsheet
 library(car)
 library(ggvis)              # Required for plotting results
+library(googlesheets4)      # Required for reading from Google Sheets
 
 # source("R/renderJQPlot.R")  # Required to render Interactive Plots (in server.R)
 # source("R/jqplotOutput.R")  # Required to render Interactive Plots (in ui.R)
@@ -38,8 +39,12 @@ accepted.files <- c('.csv','text/csv', 'text/comma-separated-values','text/plain
 
 # Default URL for dropbox and google spreadsheet files when app loads. Links are currently for Fighter jet data
 # (used in ui.R)
-#dropbox.default <- 'https://dl.dropboxusercontent.com/u/114755843/Martino_data.csv'
-#gs.default <- 'https://docs.google.com/a/pdx.edu/spreadsheet/ccc?key=0Ah3jpDcVSUVpdFlIdWNzV2NmVHJ5bFQxcXZ5MnBNNnc#gid=0'
+# dropbox.default <- 'https://dl.dropboxusercontent.com/u/114755843/Martino_data.csv'
+dropbox.default <- 'https://www.dropbox.com/s/6hc79kkb2hk141m/Martino_data_DB.csv'
+
+# gs.default <- 'https://docs.google.com/a/pdx.edu/spreadsheet/ccc?key=0Ah3jpDcVSUVpdFlIdWNzV2NmVHJ5bFQxcXZ5MnBNNnc#gid=0'
+# gs.default <- 'https://docs.google.com/spreadsheets/d/1phj9kB7qzT5bfJVblrNdtvr88xQJqCkcUuM9gTUk1WA/edit#gid=0'
+gs.default <- 'https://docs.google.com/spreadsheets/d/19CarK8ncOps9mC9i_E2m671zlssb0POvnod8mBfsCRM/edit?usp=sharing'
 
 # List of options for TFDEA analysis (used in ui.R)
 orientation.opts <- list(Output = 'out', Input = 'in')

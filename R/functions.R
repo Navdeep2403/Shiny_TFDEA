@@ -52,32 +52,42 @@ data.load <- function(fsource, data.location = NULL, col.header = FALSE, row.hea
          # Google Spreadsheet file source selected by user
          google = {
            # sql query to select rows of data where column A is not empty
-           select.query <- "select * where A!=''"
-           # Split URL by key
-           url.split <- unlist(strsplit(data.location,"key="))
-           # If there is no key specified in the URL, return an error
-           if (length(url.split) < 2) {
-             set.error("Google spreadsheet URL does not include a key (key=)")
-             return(data.frame())
-           }
-           # Split URL by spreadsheet identifier (gid)
-           url.split <- unlist(strsplit(url.split[2],"#gid="))
-           # Google spreadsheet key, between 'key=' and '#gid=' in URL
-           file.key <- url.split[1] 
-           # If the sheet number is not specified, then the first sheet will be selected
-           # Sheet number (starting at 0), follows '#gid=' in URL
-           file.gid <- ifelse (length(url.split) < 2, 0, url.split[2])
+           # select.query <- "select * where A!=''"
+           # # Split URL by key
+           # url.split <- unlist(strsplit(data.location,"key="))
+           # # If there is no key specified in the URL, return an error
+           # if (length(url.split) < 2) {
+           #   set.error("Google spreadsheet URL does not include a key (key=)")
+           #   return(data.frame())
+           # }
+           # # Split URL by spreadsheet identifier (gid)
+           # url.split <- unlist(strsplit(url.split[2],"#gid="))
+           # # Google spreadsheet key, between 'key=' and '#gid=' in URL
+           # file.key <- url.split[1]
+           # # If the sheet number is not specified, then the first sheet will be selected
+           # # Sheet number (starting at 0), follows '#gid=' in URL
+           # file.gid <- ifelse (length(url.split) < 2, 0, url.split[2])
+           # 
+           # # Create the URL for the spreadsheet using the query, key and gid
+           # file.url <- paste(sep="",'https://spreadsheets.google.com/tq?', 'tqx=out:csv','&tq=',
+           #                   curlEscape(select.query), '&key=', file.key, '&gid=', file.gid)
            
-           # Create the URL for the spreadsheet using the query, key and gid
-           file.url <- paste(sep="",'https://spreadsheets.google.com/tq?', 'tqx=out:csv','&tq=', 
-                             curlEscape(select.query), '&key=', file.key, '&gid=', file.gid)
+           url <- toString(data.location)
+           print(url)
            
+           # Disable authentication for public Google Sheets
+           gs4_deauth()
+           # print(read_sheet(file.url))
+           # print(file.url[1])
+
            # Retrieve the data from the specified spreadsheet URL
            tryCatch(
-             df <- read.csv(textConnection(getURL(file.url, ssl.verifypeer = FALSE)), 
-                            header=col.header, stringsAsFactors = FALSE),
+             # df <- read.csv(textConnection(getURL(file.url, ssl.verifypeer = FALSE)),
+             #                header=col.header, stringsAsFactors = FALSE),
+             df <- as.data.frame(read_sheet(url)),
              error = function(e) { set.error(paste("Error accessing Google spreadhsheet:", e)) 
                                    return(NULL) })
+           print(df)
            
          },
          # Dropbox file source selected by user
@@ -105,6 +115,7 @@ data.load <- function(fsource, data.location = NULL, col.header = FALSE, row.hea
   
   # If the dataset has no rows then there is no data in the source file. Return error
   if (nrow(df) == 0) {
+  # if (!isTruthy(df)) {
     set.error("Data cannot be found at specified location or chosen parameters not correct")
     return(data.frame()) 
   }
@@ -130,10 +141,12 @@ data.load <- function(fsource, data.location = NULL, col.header = FALSE, row.hea
 # df -> uploaded data
 populate.options <- function(df) {
   # Determine the names of the columns that are numeric
+  print(df)
   col.numeric <- sapply(df, is.numeric)
+  print(col.numeric)
   
   # If no numeric columns exist, return error
-  if (sum(col.numeric) != 0)                 
+  if (sum(col.numeric) != 0)
     col.names <- colnames(df[, col.numeric], do.NULL = TRUE)
   else {
     set.error("There are no numeric columns. Ensure all entries in input/output columns
@@ -302,7 +315,7 @@ lr.analysis <- function(df, inputs, outputs, intro.date, front.date){
   # Combine inputs and outputs as independent variables and remove Constant_1
   indep.var <- c(inputs, outputs)
   indep.var <- indep.var[which(indep.var != "Constant_1")]
-  
+
   # Create formula using the introduction date as the dependent variable and the inputs/outputs
   # as independent variables
   formula <- as.formula(paste(intro.date, ' ~ ', paste(indep.var, collapse = '+'))) 
