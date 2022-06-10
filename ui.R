@@ -10,6 +10,7 @@
 shinyUI(pageWithSidebar(
   
   # Top panel displaying header
+  # headerPanel(HTML("<h3>Technology Forecasting using DEA or TFDEA</h3>"),
   headerPanel(HTML("<h3>Technology Forecasting using DEA (TFDEA)</h3>"), 
               windowTitle = "TFDEA"),
   
@@ -25,7 +26,7 @@ shinyUI(pageWithSidebar(
     
     # Setup tabs for the user to enter required parameters for analysis
     tabsetPanel(id="ts.setup",
-                tabPanel("1.Upload File", value="ts.setup.upload",
+                tabPanel("Upload File", value="ts.setup.upload",
                          #selectInput('fsource', 'File Source:', file.source.opts),
                          selectInput('fsource', 'File Source:',
                                      # list(Local='local', 'Google Spreadsheet'='google'), 'Local'),
@@ -74,8 +75,38 @@ shinyUI(pageWithSidebar(
                               SETUP MODEL tab above to continue"),
                          br(), br(),
                          actionButton("btn.display","Display Data")
-                ),      
-                tabPanel("2.Setup Model", value = "ts.setup.model",
+                ),
+                tabPanel("Choose Model", value="ts.setup.model",
+                         selectInput('model', 'Model:',
+                                     # list(Local='local', 'Google Spreadsheet'='google'), 'Local'),
+                                     list('TFDEA'='tfdea', 'DEA'='dea', 'DEA Multiplier'='dea_multiplier'), 'TFDEA'),
+                         # This panel will only display when the local option has been selected for File Source
+                         # conditionalPanel(
+                         #   condition = "input.fsource == 'local'",
+                         #   fileInput('data.file', 'Choose CSV File:', accept= accepted.files)
+                         # ),                         
+                         # # This panel will only display when the google option has been selected for File Source
+                         # conditionalPanel(
+                         #   condition = "input.fsource == 'google'",
+                         #   HTML("<ol><li><a href = 'https://docs.google.com/spreadsheet' target = '_blank'>If required,
+                         #        click here to create new Google Spreadsheet:</a></li><li>Share the Google Spreadsheet,
+                         #        then copy the URL into the text area below:</li></ol>"),
+                         #   tags$textarea(id='gs.url', rows=3, cols=40, class="textarea",
+                         #                 placeholder=gs.default, required=TRUE, gs.default)
+                         # ),
+                         # 
+                         # # This panel will only display when the dropbox option has been selected  for File Source
+                         # conditionalPanel(
+                         #   condition = "input.fsource == 'dropbox'",
+                         #   HTML("Copy the Dropbox URL (including http(s)) into the textboxes below:"),
+                         #   br(),
+                         #   tags$textarea(id='dropbox.url', class="textarea", rows=2, cols=40,
+                         #                 placeholder = dropbox.default, required=TRUE, dropbox.default)
+                         # ),
+                         actionButton("btn.next","Next")
+                ),
+                tabPanel("TFDEA Setup Model", value = "ts.setup.tfdea_selection",
+                        # selectInput('intro.package', 'Select analysis package:', 'DEA','TFDEA', multiple = TRUE),
                          selectInput('intro.date', 'Select Year of Introduction Column:', 'NONE', multiple = FALSE),
                          # Creates numeric input for frontier date and updates to range of dates in introduction column
                          # selected above
@@ -88,7 +119,15 @@ shinyUI(pageWithSidebar(
                          selectInput('secondary.obj', 'Secondary Objective:', secondary.obj.opts),
                          checkboxInput('segroc', 'Segemented ROC', FALSE),
                          br(),
-                         actionButton("btn.analysis","Run Analysis")
+                         actionButton("btn.tfdeaanalysis","Run TFDEA Analysis")
+                ),
+                tabPanel("DEA Setup Model", value = "ts.setup.dea_selection",
+                         selectInput('dea.inputs', 'Select Input(s):', 'NONE', multiple = TRUE),
+                         selectInput('dea.outputs', 'Select Output(s):', 'NONE', multiple = TRUE),
+                         selectInput('dea.orientation', 'Orientation:', orientation.opts),
+                         selectInput('dea.rts', 'Return to Scale:', crs.opts),
+                         br(),
+                         actionButton("btn.deaanalysis","Run DEA Analysis")
                 )
     )
   ),
@@ -109,7 +148,7 @@ shinyUI(pageWithSidebar(
                              div(class="span3", checkboxInput('plot.lr.b', 'Include LR Results', TRUE))
                          ),
                          helpText("Notes: (1) Hover over DMUs to see details, (2) Download using button at top right of plot."),
-#                          jqplotOutput("plot.result")
+#                       jqplotOutput("plot.result")
                         ggvisOutput("ggvis")
                 ),
                 tabPanel("Result TFDEA", value="ts.result.tfdea",
@@ -120,6 +159,23 @@ shinyUI(pageWithSidebar(
                          dataTableOutput('dt.tfdea.summary'),
                          h6("FORECAST RESULTS"),
                          dataTableOutput('dt.tfdea.forecast')
+                ),
+                tabPanel("Result DEA", value="ts.result.dea",
+                         h5("DEA RESULTS"),
+                         uiOutput("btn.dea"),
+                         br(),
+                         h6("EFFICIENCY"),
+                         dataTableOutput('dt.dea.eff'),
+                         h6("LAMBA VALUES"),
+                         dataTableOutput('dt.dea.lambda'),
+                         h6("OBJECTIVE VALUES"),
+                         dataTableOutput('dt.dea.objval'),
+                         h6("RETURN TO SCALE"),
+                         dataTableOutput('dt.dea.RTS'),
+                         h6("ORIENTATION"),
+                         dataTableOutput('dt.dea.ORIENTATION'),
+                         h6("TRANSPOSE"),
+                         dataTableOutput('dt.dea.TRANSPOSE')
                 ),
                 tabPanel("Result LR", value="ts.result.lr",
                          h5("LINEAR REGRESSION RESULTS"),

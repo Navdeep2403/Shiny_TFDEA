@@ -6,13 +6,23 @@
 #******************************************************************************
 
 g.df      <- reactiveValues(data = data.frame())              # contains the uploaded data
-g.result  <- reactiveValues(tfdea = list(), lr = list())      # contains TFDEA and LR results
+g.result  <- reactiveValues(tfdea = list(), lr = list(), dea = list())      # contains TFDEA and LR results
 g.error   <- NULL                                             # contains error message displayed to user
-
+g.model   <- reactiveValues(value = data.frame())
 
 # Functions to access and set variables from within server code
 
 # Used in server.R, tables.R, io.R
+get.model <- function() {
+  return(g.model$value)
+}
+
+# Used in server.R
+set.model <- function(model) {
+  g.model$value <- model
+}
+
+
 get.df <- function() {
   return(g.df$data)
 }
@@ -25,6 +35,11 @@ set.df <- function(df) {
 # Used in tables.R, plot.R, io.R
 get.result <- function() {
   return(g.result)
+}
+
+# Used in server.R
+set.result.dea <- function(result) {
+  g.result$dea <- result
 }
 
 # Used in server.R

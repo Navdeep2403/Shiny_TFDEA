@@ -162,7 +162,80 @@ populate.options <- function(df) {
                     col.names, selected = NULL)
   updateSelectInput(session, 'intro.date', 'Select Year of Introduction:', 
                     col.names[-1])
+  
+  updateSelectInput(session, 'dea.inputs', 'Select Input(s):', 
+                    col.names, selected = NULL)
+  updateSelectInput(session, 'dea.outputs', 'Select Output(s):', 
+                    col.names, selected = NULL)
 }
+
+
+# Conduct DEA analysis:
+# Parameters:
+# df                          -> uploaded data
+# inputs/outputs              -> TFDEA inputs and outputs
+# intro.date                  -> date of introduction column
+# front.date                  -> frontier date
+# rts/orientation             -> returns to scale and orientation of TFDEA model
+# secondary.obj/frontier.type -> secondary objective and frontier type of TFDEA model
+# segroc                      -> segmented rate of change
+# Return:
+# Forecast                    -> forecasted dates, ROCs, and efficiencies
+# Model                       -> TFDEA parameters used for the analysis
+# Summary                     -> MAD, Average ROC, ROC contributors, and other relevant information 
+dea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "output") {
+  
+  print("Inside dea.analysis")
+  # Check parameter values
+  if (length(input$dea.inputs) == 0) {
+    set.error("No input(s) selected. Select a minimum of 1 input") 
+    return(NULL) 
+  }
+  if (length(input$dea.outputs) == 0) {
+    set.error("No output(s) selected. Select a minimum of 1 output") 
+    return(NULL) 
+  }
+  if (nrow(df) == 0) {
+    set.error("No data exists in selected data file") 
+    return(NULL) 
+  }
+
+  dmu.count <- nrow(df)
+  dmu.names <- row.names(df)
+  # Create vector of all 1's for constant
+  constant <- rep(1, dmu.count)
+  
+  # Check if constant_1 was selected and if so append to inputs/outputs
+  x.constant <- match("Constant_1", inputs)
+  y.constant <- match("Constant_1", outputs)
+  if (!is.na(x.constant))  
+    x <- cbind(constant, df[inputs[-x.constant]])
+  else                            
+    x <- df[inputs]
+  
+  if (!is.na(y.constant))  
+    y <- cbind(constant, df[outputs[-y.constant]])
+  else                            
+    y <- df[outputs]
+  
+  # Assign names to inputs and outputs
+  colnames(x) <- toupper(paste('x', colnames(x), sep='_'))
+  colnames(y) <- toupper(paste('y', colnames(y), sep='_'))
+  
+  orientation <- "out"
+
+  
+  DEA <- dea(X = x, Y = y, RTS = rts, ORIENTATION = orientation)
+  
+  # DEA.plot <- dea.plot(x, y, RTS = rts, ORIENTATION = orientation, txt=LETTERS[1:length(x)])
+  DEA.x <- x
+  DEA.y <- y
+  DEA.rts <- rts
+  DEA.orientation <- orientation
+
+  return(DEA) 
+}
+
 
 
 # Conduct TFDEA analysis:
@@ -233,6 +306,7 @@ tfdea.analysis <- function(df, inputs, outputs, intro.date, front.date, rts = "v
     error = function(e) { set.error(paste("Error with TFDEA analysis:", e)) 
                           return(NULL) })
   
+  print(tfdea.output)
   # Calculate Mean Absolute Deviation (MAD)
   dev.dates <- tfdea.output$dmu_date_for - df[, intro.date]
   mad <- mean(abs(dev.dates), na.rm = TRUE)

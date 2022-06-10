@@ -15,9 +15,18 @@ shinyServer(function(input, output, session) {
   source("R/functions.R", local=TRUE)$value   # Functions used throughout the server code
   # source("R/io.R", local=TRUE)$value          # Creates new inputs and download buttons using renderUI 
   
+
+  # hide tabs in the side panel
+  hideTab("ts.setup", "ts.setup.dea_selection", session)
+  hideTab("ts.setup", "ts.setup.tfdea_selection", session)
+
+  # hide tabs in the result panel
+  hideTab("ts.result", "ts.result.dea", session)
+  hideTab("ts.result", "ts.result.tfdea", session)
+  hideTab("ts.result", "ts.result.lr", session)
   
   output$frontier.date <- renderUI({
-    
+
     # Get data and the current intro date
     df <- get.df()
     intro.date <- get.intro.date() 
@@ -135,7 +144,109 @@ shinyServer(function(input, output, session) {
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
                     paging = FALSE, info = FALSE))
   
+
+  # Display DEA efficiency results
+  output$dt.dea.eff <- renderDataTable({
+    df <- get.df()
+    result <- get.result()
+    if (length(result$dea$eff) == 0)
+      return(NULL)
+    
+    table <- result$dea$eff
+    table <- format(table, nsmall = 2)
+    
+    # renderDataTable does not show row names or numbers, so need to append both
+    table <- cbind(seq(nrow(df)), rownames(table), table) 
+    names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    lengthMenu = c(10, 20, 30), pageLength = 10))
   
+  # Display DEA efficiency results
+  output$dt.dea.lambda <- renderDataTable({
+    df <- get.df()
+    result <- get.result()
+    if (length(result$dea$lambda) == 0)
+      return(NULL)
+    
+    table <- result$dea$lambda
+    table <- format(table, nsmall = 2)
+    
+    # renderDataTable does not show row names or numbers, so need to append both
+    table <- cbind(seq(nrow(df)), rownames(table), table) 
+    names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    lengthMenu = c(10, 20, 30), pageLength = 10))
+  
+  # Display DEA efficiency results
+  output$dt.dea.objval <- renderDataTable({
+    df <- get.df()
+    result <- get.result()
+    if (length(result$dea$objval) == 0)
+      return(NULL)
+    
+    table <- result$dea$objval
+    table <- format(table, nsmall = 2)
+    
+    # renderDataTable does not show row names or numbers, so need to append both
+    table <- cbind(seq(nrow(df)), rownames(table), table) 
+    names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    lengthMenu = c(10, 20, 30), pageLength = 10))
+  
+  # Display DEA efficiency results
+  output$dt.dea.RTS <- renderDataTable({
+    df <- get.df()
+    result <- get.result()
+    if (length(result$dea$RTS) == 0)
+      return(NULL)
+    
+    table <- result$dea$RTS
+    table <- format(table, nsmall = 2)
+    
+    # renderDataTable does not show row names or numbers, so need to append both
+    table <- cbind(seq(nrow(df)), rownames(table), table) 
+    names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    lengthMenu = c(10, 20, 30), pageLength = 10))
+  
+  # Display DEA efficiency results
+  output$dt.dea.ORIENTATION <- renderDataTable({
+    df <- get.df()
+    result <- get.result()
+    if (length(result$dea$ORIENTATION) == 0)
+      return(NULL)
+    
+    table <- result$dea$ORIENTATION
+    table <- format(table, nsmall = 2)
+    
+    # renderDataTable does not show row names or numbers, so need to append both
+    table <- cbind(seq(nrow(df)), rownames(table), table) 
+    names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    lengthMenu = c(10, 20, 30), pageLength = 10))
+  
+  # Display DEA efficiency results
+  output$dt.dea.TRANSPOSE <- renderDataTable({
+    df <- get.df()
+    result <- get.result()
+    if (length(result$dea$TRANSPOSE) == 0)
+      return(NULL)
+    
+    table <- result$dea$TRANSPOSE
+    table <- format(table, nsmall = 2)
+    
+    # renderDataTable does not show row names or numbers, so need to append both
+    table <- cbind(seq(nrow(df)), rownames(table), table) 
+    names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    lengthMenu = c(10, 20, 30), pageLength = 10))  
+    
   # Display TFDEA forecast results
   output$dt.tfdea.forecast <- renderDataTable({
     df <- get.df()
@@ -270,36 +381,77 @@ shinyServer(function(input, output, session) {
     }
   }) # observe display
   
-  # Observe the Run Analysis button. When pressed, run TFDEA and linear regression analysis and
+  # Observe the Model Selection button. When pressed, go to next tab with de linear regression analysis and
   # display the results in the appropriate tables
   observe({
     # input$btn.analysis increases by 1 each time the button is pressed
-    if (input$btn.analysis != 0){
+    if (input$btn.next != 0){
       
-        # Disable buttons to prevent user interaction
-#         elem.disable("btn", TRUE, TRUE)
+      # Disable buttons to prevent user interaction
+      #         elem.disable("btn", TRUE, TRUE)
+      
+      # Calculate results and show progress bar
+      #         withProgress(session, {
+      #           setProgress(message = 'Calculation in Progress',
+      #                       detail = 'This may take a while...')
+      
+      isolate({
+        data.model <- input$model
         
-        # Calculate results and show progress bar
-#         withProgress(session, {
-#           setProgress(message = 'Calculation in Progress',
-#                       detail = 'This may take a while...')
-          
+
+        # Find if any error occurred, and if so display
+        error <- get.error()
+        if (!is.null(error))
+          session$sendCustomMessage(type = "show_error", error)
+        
+        # Re-enable buttons
+        elem.disable("btn", FALSE, TRUE)
+      })
+      # print(data.model)
+
+      if (data.model == "tfdea") {
+        print("Inside TFDEA")
+        # Change the results tabset to display the plot
+        hideTab("ts.setup", "ts.setup.dea_selection", session)
+        showTab("ts.setup", "ts.setup.tfdea_selection", select = TRUE, session)
+        set.model(data.model)
+
+        # populate.options(df)
+        # updateTabsetPanel(session, "ts.setup", selected = "ts.setup.tfdea_selection")
+      }
+      if (data.model == "dea") {
+        print("Inside DEA")
+        # Change the results tabset to display the plot
+        hideTab("ts.setup", "ts.setup.tfdea_selection", session)
+        showTab("ts.setup", "ts.setup.dea_selection", select = TRUE, session)
+        set.model(data.model)
+
+        # populate.dea_options(df)
+        # updateTabsetPanel(session, "ts.setup", selected = "ts.setup.dea_selection")
+      }
+    }
+  }) # observe analysis
+  
+  # Observe the Run Analysis button. When pressed, 
+  observe({
+    # input$btn.analysis increases by 1 each time the button is pressed
+    #
+    # check the model if DEA and run DEA Analysis and
+    # display the results in the appropriate tables
+    if (input$btn.deaanalysis != 0 && get.model() == "dea"){
+      
           isolate({
             # Get uploaded data saved in the global server df dataframe
             df <- get.df()
-          
-            # Run TFDEA analysis with selected parameters (location: function.R)
-            tfdea <- tfdea.analysis(df, input$tfdea.inputs, input$tfdea.outputs, input$intro.date, 
-                                    input$front.date, input$rts, input$orientation, input$secondary.obj,
-                                    input$frontier.type, input$segroc)
             
-            # Run linear regression analysis with selected parameters (location: function.R)
-            lr <- lr.analysis(df, input$tfdea.inputs, input$tfdea.outputs, input$intro.date, input$front.date)
+            print("Inside DEA Analysis")
             
-            # Set global server results. This is required so the results can be accessed by downHandler
-            # and renderDataTable functions. results cannot be sent as an argument to these functions.
-            set.result.tfdea(tfdea)
-            set.result.lr(lr)
+            dea <- dea.analysis(df, input$dea.inputs, input$dea.outputs, input$rts, input$orientation)
+            
+            set.result.dea(dea)
+            set.result.tfdea(list())
+            set.result.lr(list())
+
           })
 #         }) 
         
@@ -311,17 +463,75 @@ shinyServer(function(input, output, session) {
         # Re-enable buttons
         elem.disable("btn", FALSE, TRUE)
       
-      # Change the results tabset to display the plot
+      # hideTab("ts.result", "ts.result.plot", session)
+      hideTab("ts.result", "ts.result.lr", session)
+      hideTab("ts.result", "ts.result.tfdea", session)
+      showTab("ts.result", "ts.result.dea", select = FALSE, session)
+      updateTabsetPanel(session, "ts.result", selected = "ts.result.dea")
+    }
+    
+    # check the model if TFDEA and run TFDEA and linear regression analysis and
+    # display the results in the appropriate tables
+    if (input$btn.tfdeaanalysis != 0 && get.model() == "tfdea"){
+      
+      # Disable buttons to prevent user interaction
+      #         elem.disable("btn", TRUE, TRUE)
+      
+      # Calculate results and show progress bar
+      #         withProgress(session, {
+      #           setProgress(message = 'Calculation in Progress',
+      #                       detail = 'This may take a while...')
+      isolate({
+        # Get uploaded data saved in the global server df dataframe
+        df <- get.df()
+        
+        print("Inside TFDEA Analysis")
+        
+        # Run TFDEA analysis with selected parameters (location: function.R)
+        # tfdea <- tfdea.analysis(df, input$tfdea.inputs, input$tfdea.outputs, input$intro.date, 
+        #                         input$front.date, input$rts, input$orientation, input$secondary.obj,
+        #                         input$frontier.type, input$segroc)
+        tfdea <- tfdea.analysis(df, input$tfdea.inputs, input$tfdea.outputs, input$intro.date,
+                                input$front.date, input$rts, input$orientation, input$secondary.obj,
+                                input$frontier.type, input$segroc)
+        
+        # Run linear regression analysis with selected parameters (location: function.R)
+        lr <- lr.analysis(df, input$tfdea.inputs, input$tfdea.outputs, input$intro.date, input$front.date)
+        
+        # Set global server results. This is required so the results can be accessed by downHandler
+        # and renderDataTable functions. results cannot be sent as an argument to these functions.
+        set.result.dea(list())
+        set.result.tfdea(tfdea)
+        set.result.lr(lr)
+        
+      })
+      #         }) 
+      
+      # Find if any error occurred, and if so display
+      error <- get.error()
+      if (!is.null(error))
+        session$sendCustomMessage(type = "show_error", error)
+      
+      # Re-enable buttons
+      elem.disable("btn", FALSE, TRUE)
+
+      hideTab("ts.result", "ts.result.dea", session)
+      showTab("ts.result", "ts.result.tfdea", select = FALSE,  session)
+      showTab("ts.result", "ts.result.lr", select = FALSE, session)
       updateTabsetPanel(session, "ts.result", selected = "ts.result.plot")
+
     }
   }) # observe analysis
   
+
   # Observe the change in results. If the results change, update plot accordingly
   observe({
+    
+    print("Inside Plot results section")
     # Get TFDEA and linear regression results saved in the global server results list
     result <- get.result()
     # Plot results(location: plots.R)
-    plot.result(result$lr, result$tfdea)
+    plot.result(result$lr, result$tfdea, result$dea)
   })
   
   # Observe the change in the intro.date selectInput value. This ensures that when a 
@@ -361,7 +571,7 @@ shinyServer(function(input, output, session) {
       updateSelectInput(session, 'tfdea.outputs', 'Select Output(s):', 
                         col.names.out)
     }
-    
+
   }) # observe intro.date
- 
+
 })

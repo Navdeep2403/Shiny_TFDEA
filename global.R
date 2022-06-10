@@ -17,11 +17,12 @@ library(shiny)              # Required for the Shiny application
 library(shinyIncubator)     # Required for additional Shiny options
 library(RCurl)              # Required for obtaining data from Google spreadsheets 
 library(TFDEA)              # Required for TFDEA analysis
+library(Benchmarking)       # Required for DEA analysis
 library(WriteXLS)           # Required for Writing results to an XLS spreadsheet
 library(car)
 library(ggvis)              # Required for plotting results
 library(googlesheets4)      # Required for reading from Google Sheets
-
+library(deaR)
 # source("R/renderJQPlot.R")  # Required to render Interactive Plots (in server.R)
 # source("R/jqplotOutput.R")  # Required to render Interactive Plots (in ui.R)
 
@@ -52,4 +53,3 @@ crs.opts <- list('Variable Returns to Scale' = 'vrs', 'Constant Returns to Scale
                  'Decreasing Returns to Scale' = 'drs', 'Increasing Returns to Scale' = 'irs')
 frontier.type.opts <- list(Static = 'static', Dynamic = 'dynamic')
 secondary.obj.opts <- list(Min = 'min', Max = 'max')
-
