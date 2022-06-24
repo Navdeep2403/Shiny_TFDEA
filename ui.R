@@ -30,7 +30,7 @@ shinyUI(pageWithSidebar(
                          #selectInput('fsource', 'File Source:', file.source.opts),
                          selectInput('fsource', 'File Source:',
                                      # list(Local='local', 'Google Spreadsheet'='google'), 'Local'),
-                                     list(Local='local', 'Google Spreadsheet'='google', Dropbox='dropbox'), 'Local'),
+                                     list(Local='local', 'Google Spreadsheet'='google'), 'Local'),
                          
                          # This panel will only display when the local option has been selected for File Source
                          conditionalPanel(
@@ -79,7 +79,7 @@ shinyUI(pageWithSidebar(
                 tabPanel("Choose Model", value="ts.setup.model",
                          selectInput('model', 'Model:',
                                      # list(Local='local', 'Google Spreadsheet'='google'), 'Local'),
-                                     list('TFDEA'='tfdea', 'DEA'='dea', 'DEA Multiplier'='dea_multiplier'), 'TFDEA'),
+                                     list('TFDEA'='tfdea', 'DEA'='dea', 'DEA Multiplier'='mdea'), 'TFDEA'),
                          # This panel will only display when the local option has been selected for File Source
                          # conditionalPanel(
                          #   condition = "input.fsource == 'local'",
@@ -128,6 +128,14 @@ shinyUI(pageWithSidebar(
                          selectInput('dea.rts', 'Return to Scale:', crs.opts),
                          br(),
                          actionButton("btn.deaanalysis","Run DEA Analysis")
+                ),
+                tabPanel("MultiplierDEA Setup Model", value = "ts.setup.mdea_selection",
+                         selectInput('dea.inputs', 'Select Input(s):', 'NONE', multiple = TRUE),
+                         selectInput('dea.outputs', 'Select Output(s):', 'NONE', multiple = TRUE),
+                         selectInput('dea.orientation', 'Orientation:', orientation.opts),
+                         selectInput('dea.rts', 'Return to Scale:', crs.opts),
+                         br(),
+                         actionButton("btn.mdeaanalysis","Run MultiplierDEA Analysis")
                 )
     )
   ),
@@ -176,6 +184,23 @@ shinyUI(pageWithSidebar(
                          dataTableOutput('dt.dea.ORIENTATION'),
                          h6("TRANSPOSE"),
                          dataTableOutput('dt.dea.TRANSPOSE')
+                ),
+                tabPanel("Result MultiplierDEA", value="ts.result.mdea",
+                         h5("MULTIPLIER DEA RESULTS"),
+                         uiOutput("btn.mdea"),
+                         br(),
+                         h6("EFFICIENCY"),
+                         dataTableOutput('dt.mdea.eff'),
+                         h6("LAMBA VALUES"),
+                         dataTableOutput('dt.mdea.lambda'),
+                         h6("OBJECTIVE VALUES"),
+                         dataTableOutput('dt.mdea.objval'),
+                         h6("RETURN TO SCALE"),
+                         dataTableOutput('dt.mdea.RTS'),
+                         h6("ORIENTATION"),
+                         dataTableOutput('dt.mdea.ORIENTATION'),
+                         h6("TRANSPOSE"),
+                         dataTableOutput('dt.mdea.TRANSPOSE')
                 ),
                 tabPanel("Result LR", value="ts.result.lr",
                          h5("LINEAR REGRESSION RESULTS"),

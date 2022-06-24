@@ -17,12 +17,14 @@ shinyServer(function(input, output, session) {
   
 
   # hide tabs in the side panel
-  hideTab("ts.setup", "ts.setup.dea_selection", session)
   hideTab("ts.setup", "ts.setup.tfdea_selection", session)
+  hideTab("ts.setup", "ts.setup.dea_selection", session)
+  hideTab("ts.setup", "ts.setup.mdea_selection", session)
 
   # hide tabs in the result panel
   hideTab("ts.result", "ts.result.dea", session)
   hideTab("ts.result", "ts.result.tfdea", session)
+  hideTab("ts.result", "ts.result.mdea", session)
   hideTab("ts.result", "ts.result.lr", session)
   
   output$frontier.date <- renderUI({
@@ -413,6 +415,7 @@ shinyServer(function(input, output, session) {
         print("Inside TFDEA")
         # Change the results tabset to display the plot
         hideTab("ts.setup", "ts.setup.dea_selection", session)
+        hideTab("ts.setup", "ts.setup.mdea_selection", session)
         showTab("ts.setup", "ts.setup.tfdea_selection", select = TRUE, session)
         set.model(data.model)
 
@@ -423,11 +426,23 @@ shinyServer(function(input, output, session) {
         print("Inside DEA")
         # Change the results tabset to display the plot
         hideTab("ts.setup", "ts.setup.tfdea_selection", session)
+        hideTab("ts.setup", "ts.setup.mdea_selection", session)
         showTab("ts.setup", "ts.setup.dea_selection", select = TRUE, session)
         set.model(data.model)
 
         # populate.dea_options(df)
         # updateTabsetPanel(session, "ts.setup", selected = "ts.setup.dea_selection")
+      }
+      if (data.model == "mdea") {
+        print("Inside MULTIPLIER_DEA")
+        # Change the results tabset to display the plot
+        hideTab("ts.setup", "ts.setup.dea_selection", session)
+        hideTab("ts.setup", "ts.setup.tfdea_selection", session)
+        showTab("ts.setup", "ts.setup.mdea_selection", select = TRUE, session)
+        set.model(data.model)
+        
+        # populate.options(df)
+        # updateTabsetPanel(session, "ts.setup", selected = "ts.setup.tfdea_selection")
       }
     }
   }) # observe analysis
