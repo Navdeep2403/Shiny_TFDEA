@@ -10,7 +10,7 @@
 # lr      -> linear regression results
 # tfdea   -> tfdea results
 # dea     -> dea results
-plot.result <- function(lr, tfdea, dea) {
+plot.result <- function(lr, tfdea, dea, mdea) {
   
   if (length(tfdea) != 0) {
     print("Inside TFDEA section")
@@ -80,6 +80,21 @@ plot.result <- function(lr, tfdea, dea) {
         layer_points() %>%
         layer_text(x = ~dmu, y = ~efficiency, text := ~efficiency)
 
+
+  }
+  else if(length(mdea) != 0) {
+    print("MULTIPLIER_DEA results non-empty")
+    eff <- round(mdea$Efficiency, digits = 1)
+    
+    # Create a dataframe with all the data to be plotted
+    plot.data <- data.frame(rownames(data.frame(eff)), eff)
+    names(plot.data) <- c("dmu", "efficiency")
+    # print("DEA plot print")
+    # print(plot.data)
+    
+    p <- plot.data %>% ggvis(~dmu, ~efficiency) %>%
+      layer_points() %>%
+      layer_text(x = ~dmu, y = ~efficiency, text := ~efficiency)
 
   }
   else 

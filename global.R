@@ -9,7 +9,7 @@ packages <- c("Rcpp", "dplyr", "shiny", "RCurl", "TFDEA", "WriteXLS", "car", "de
 if (length(setdiff(packages, installed.packages())) > 0)
   install.packages(setdiff(packages, installed.packages()))
 
-# Install required packages not part of cran
+# Install required packages not part of cran  
 if (!"shinyIncubator" %in% installed.packages())
   devtools::install_github("rstudio/shiny-incubator")
 
@@ -23,6 +23,7 @@ library(car)
 library(ggvis)              # Required for plotting results
 library(googlesheets4)      # Required for reading from Google Sheets
 library(deaR)
+library(MultiplierDEA)  
 # source("R/renderJQPlot.R")  # Required to render Interactive Plots (in server.R)
 # source("R/jqplotOutput.R")  # Required to render Interactive Plots (in ui.R)
 

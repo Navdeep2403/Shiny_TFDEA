@@ -130,10 +130,10 @@ shinyUI(pageWithSidebar(
                          actionButton("btn.deaanalysis","Run DEA Analysis")
                 ),
                 tabPanel("MultiplierDEA Setup Model", value = "ts.setup.mdea_selection",
-                         selectInput('dea.inputs', 'Select Input(s):', 'NONE', multiple = TRUE),
-                         selectInput('dea.outputs', 'Select Output(s):', 'NONE', multiple = TRUE),
-                         selectInput('dea.orientation', 'Orientation:', orientation.opts),
-                         selectInput('dea.rts', 'Return to Scale:', crs.opts),
+                         selectInput('mdea.inputs', 'Select Input(s):', 'NONE', multiple = TRUE),
+                         selectInput('mdea.outputs', 'Select Output(s):', 'NONE', multiple = TRUE),
+                         selectInput('mdea.orientation', 'Orientation:', orientation.opts),
+                         selectInput('mdea.rts', 'Return to Scale:', crs.opts),
                          br(),
                          actionButton("btn.mdeaanalysis","Run MultiplierDEA Analysis")
                 )
@@ -190,17 +190,9 @@ shinyUI(pageWithSidebar(
                          uiOutput("btn.mdea"),
                          br(),
                          h6("EFFICIENCY"),
-                         dataTableOutput('dt.mdea.eff'),
+                         dataTableOutput('dt.mdea.Efficiency'),
                          h6("LAMBA VALUES"),
-                         dataTableOutput('dt.mdea.lambda'),
-                         h6("OBJECTIVE VALUES"),
-                         dataTableOutput('dt.mdea.objval'),
-                         h6("RETURN TO SCALE"),
-                         dataTableOutput('dt.mdea.RTS'),
-                         h6("ORIENTATION"),
-                         dataTableOutput('dt.mdea.ORIENTATION'),
-                         h6("TRANSPOSE"),
-                         dataTableOutput('dt.mdea.TRANSPOSE')
+                         dataTableOutput('dt.mdea.Lambda')
                 ),
                 tabPanel("Result LR", value="ts.result.lr",
                          h5("LINEAR REGRESSION RESULTS"),

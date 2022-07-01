@@ -247,7 +247,115 @@ shinyServer(function(input, output, session) {
     names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
     return(table)
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
-                    lengthMenu = c(10, 20, 30), pageLength = 10))  
+                    lengthMenu = c(10, 20, 30), pageLength = 10))
+  
+  # mDEA - Start
+  
+  # Display DEA efficiency results
+  output$dt.mdea.Efficiency <- renderDataTable({
+    df <- get.df()
+    result <- get.result()
+    if (length(result$mdea$Efficiency) == 0)
+      return(NULL)
+    
+    table <- result$mdea$Efficiency
+    table <- format(table, nsmall = 2)
+    
+    # renderDataTable does not show row names or numbers, so need to append both
+    table <- cbind(seq(nrow(df)), rownames(table), table) 
+    names(table) <- c("ROW", "DMU", toupper(names(result$mdea))) 
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    lengthMenu = c(10, 20, 30), pageLength = 10))
+  
+  # Display DEA efficiency results
+  output$dt.mdea.Lambda <- renderDataTable({
+    df <- get.df()
+    result <- get.result()
+    if (length(result$mdea$Lambda) == 0)
+      return(NULL)
+    
+    table <- result$mdea$Lambda
+    table <- format(table, nsmall = 2)
+    
+    # renderDataTable does not show row names or numbers, so need to append both
+    table <- cbind(seq(nrow(df)), rownames(table), table)
+    names(table) <- c("ROW", "DMU", toupper(names(result$mdea))) 
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    lengthMenu = c(10, 20, 30), pageLength = 10))
+  
+  # # Display DEA efficiency results
+  # output$dt.dea.objval <- renderDataTable({
+  #   df <- get.df()
+  #   result <- get.result()
+  #   if (length(result$dea$objval) == 0)
+  #     return(NULL)
+  #   
+  #   table <- result$dea$objval
+  #   table <- format(table, nsmall = 2)
+  #   
+  #   # renderDataTable does not show row names or numbers, so need to append both
+  #   table <- cbind(seq(nrow(df)), rownames(table), table) 
+  #   names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
+  #   return(table)
+  # }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+  #                   lengthMenu = c(10, 20, 30), pageLength = 10))
+  # 
+  # # Display DEA efficiency results
+  # output$dt.dea.RTS <- renderDataTable({
+  #   df <- get.df()
+  #   result <- get.result()
+  #   if (length(result$dea$RTS) == 0)
+  #     return(NULL)
+  #   
+  #   table <- result$dea$RTS
+  #   table <- format(table, nsmall = 2)
+  #   
+  #   # renderDataTable does not show row names or numbers, so need to append both
+  #   table <- cbind(seq(nrow(df)), rownames(table), table) 
+  #   names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
+  #   return(table)
+  # }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+  #                   lengthMenu = c(10, 20, 30), pageLength = 10))
+  # 
+  # # Display DEA efficiency results
+  # output$dt.dea.ORIENTATION <- renderDataTable({
+  #   df <- get.df()
+  #   result <- get.result()
+  #   if (length(result$dea$ORIENTATION) == 0)
+  #     return(NULL)
+  #   
+  #   table <- result$dea$ORIENTATION
+  #   table <- format(table, nsmall = 2)
+  #   
+  #   # renderDataTable does not show row names or numbers, so need to append both
+  #   table <- cbind(seq(nrow(df)), rownames(table), table) 
+  #   names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
+  #   return(table)
+  # }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+  #                   lengthMenu = c(10, 20, 30), pageLength = 10))
+  # 
+  # # Display DEA efficiency results
+  # output$dt.dea.TRANSPOSE <- renderDataTable({
+  #   df <- get.df()
+  #   result <- get.result()
+  #   if (length(result$dea$TRANSPOSE) == 0)
+  #     return(NULL)
+  #   
+  #   table <- result$dea$TRANSPOSE
+  #   table <- format(table, nsmall = 2)
+  #   
+  #   # renderDataTable does not show row names or numbers, so need to append both
+  #   table <- cbind(seq(nrow(df)), rownames(table), table) 
+  #   names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
+  #   return(table)
+  # }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+  #                   lengthMenu = c(10, 20, 30), pageLength = 10))
+  
+  # mDEA - End
+  
+  
     
   # Display TFDEA forecast results
   output$dt.tfdea.forecast <- renderDataTable({
@@ -464,6 +572,7 @@ shinyServer(function(input, output, session) {
             dea <- dea.analysis(df, input$dea.inputs, input$dea.outputs, input$rts, input$orientation)
             
             set.result.dea(dea)
+            set.result.mdea(list())
             set.result.tfdea(list())
             set.result.lr(list())
 
@@ -481,8 +590,45 @@ shinyServer(function(input, output, session) {
       # hideTab("ts.result", "ts.result.plot", session)
       hideTab("ts.result", "ts.result.lr", session)
       hideTab("ts.result", "ts.result.tfdea", session)
+      hideTab("ts.result", "ts.result.mdea", session)
       showTab("ts.result", "ts.result.dea", select = FALSE, session)
       updateTabsetPanel(session, "ts.result", selected = "ts.result.dea")
+    }
+    
+    # check the model if mDEA and run mDEA Analysis and
+    # display the results in the appropriate tables
+    if (input$btn.mdeaanalysis != 0 && get.model() == "mdea"){
+      
+      isolate({
+        # Get uploaded data saved in the global server df dataframe
+        df <- get.df()
+        
+        print("Inside MultiplierDEA Analysis")
+      
+        mdea <- mdea.analysis(df, input$mdea.inputs, input$mdea.outputs, input$rts, input$orientation)
+        
+        set.result.mdea(mdea)
+        set.result.dea(list())
+        set.result.tfdea(list())
+        set.result.lr(list())
+        
+      })
+      #         }) 
+      
+      # Find if any error occurred, and if so display
+      error <- get.error()
+      if (!is.null(error))
+        session$sendCustomMessage(type = "show_error", error)
+      
+      # Re-enable buttons
+      elem.disable("btn", FALSE, TRUE)
+      
+      # hideTab("ts.result", "ts.result.plot", session)
+      hideTab("ts.result", "ts.result.lr", session)
+      hideTab("ts.result", "ts.result.tfdea", session)
+      hideTab("ts.result", "ts.result.dea", session)
+      showTab("ts.result", "ts.result.mdea", select = FALSE, session)
+      updateTabsetPanel(session, "ts.result", selected = "ts.result.mdea")
     }
     
     # check the model if TFDEA and run TFDEA and linear regression analysis and
@@ -516,6 +662,7 @@ shinyServer(function(input, output, session) {
         # Set global server results. This is required so the results can be accessed by downHandler
         # and renderDataTable functions. results cannot be sent as an argument to these functions.
         set.result.dea(list())
+        set.result.mdea(list())
         set.result.tfdea(tfdea)
         set.result.lr(lr)
         
@@ -531,6 +678,7 @@ shinyServer(function(input, output, session) {
       elem.disable("btn", FALSE, TRUE)
 
       hideTab("ts.result", "ts.result.dea", session)
+      hideTab("ts.result", "ts.result.mdea", session)
       showTab("ts.result", "ts.result.tfdea", select = FALSE,  session)
       showTab("ts.result", "ts.result.lr", select = FALSE, session)
       updateTabsetPanel(session, "ts.result", selected = "ts.result.plot")
@@ -546,7 +694,7 @@ shinyServer(function(input, output, session) {
     # Get TFDEA and linear regression results saved in the global server results list
     result <- get.result()
     # Plot results(location: plots.R)
-    plot.result(result$lr, result$tfdea, result$dea)
+    plot.result(result$lr, result$tfdea, result$dea, result$mdea)
   })
   
   # Observe the change in the intro.date selectInput value. This ensures that when a 

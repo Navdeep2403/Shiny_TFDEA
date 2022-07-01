@@ -155,17 +155,23 @@ populate.options <- function(df) {
   }
   
   # Update selectInputs with names of numeric columns, with the addition of constant_1
-  col.names <- c("Constant_1", col.names) 
+  col.names <- c("Constant_1", col.names)
+  #tfdea
   updateSelectInput(session, 'tfdea.inputs', 'Select Input(s):', 
                     col.names, selected = NULL)
   updateSelectInput(session, 'tfdea.outputs', 'Select Output(s):', 
                     col.names, selected = NULL)
   updateSelectInput(session, 'intro.date', 'Select Year of Introduction:', 
                     col.names[-1])
-  
+  #dea
   updateSelectInput(session, 'dea.inputs', 'Select Input(s):', 
                     col.names, selected = NULL)
   updateSelectInput(session, 'dea.outputs', 'Select Output(s):', 
+                    col.names, selected = NULL)
+  #mdea
+  updateSelectInput(session, 'mdea.inputs', 'Select Input(s):', 
+                    col.names, selected = NULL)
+  updateSelectInput(session, 'mdea.outputs', 'Select Output(s):', 
                     col.names, selected = NULL)
 }
 
@@ -236,6 +242,74 @@ dea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "output
   return(DEA) 
 }
 
+
+# Conduct DEA analysis:
+# Parameters:
+# df                          -> uploaded data
+# inputs/outputs              -> TFDEA inputs and outputs
+# intro.date                  -> date of introduction column
+# front.date                  -> frontier date
+# rts/orientation             -> returns to scale and orientation of TFDEA model
+# secondary.obj/frontier.type -> secondary objective and frontier type of TFDEA model
+# segroc                      -> segmented rate of change
+# Return:
+# Forecast                    -> forecasted dates, ROCs, and efficiencies
+# Model                       -> TFDEA parameters used for the analysis
+# Summary                     -> MAD, Average ROC, ROC contributors, and other relevant information 
+mdea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "output") {
+  
+  print("Inside mdea.analysis")
+  # Check parameter values
+  if (length(input$mdea.inputs) == 0) {
+    set.error("No input(s) selected. Select a minimum of 1 input") 
+    return(NULL) 
+  }
+  if (length(input$mdea.outputs) == 0) {
+    set.error("No output(s) selected. Select a minimum of 1 output") 
+    return(NULL) 
+  }
+  if (nrow(df) == 0) {
+    set.error("No data exists in selected data file") 
+    return(NULL) 
+  }
+  
+  dmu.count <- nrow(df)
+  dmu.names <- row.names(df)
+  # Create vector of all 1's for constant
+  constant <- rep(1, dmu.count)
+  
+  # Check if constant_1 was selected and if so append to inputs/outputs
+  x.constant <- match("Constant_1", inputs)
+  y.constant <- match("Constant_1", outputs)
+  if (!is.na(x.constant))  
+    x <- cbind(constant, df[inputs[-x.constant]])
+  else                            
+    x <- df[inputs]
+  
+  if (!is.na(y.constant))  
+    y <- cbind(constant, df[outputs[-y.constant]])
+  else                            
+    y <- df[outputs]
+  
+  # Assign names to inputs and outputs
+  colnames(x) <- toupper(paste('x', colnames(x), sep='_'))
+  colnames(y) <- toupper(paste('y', colnames(y), sep='_'))
+  
+  orientation <- "output"
+  
+  print(x)
+  print(y)
+  print(rts)
+  print(orientation)
+  mDEA <- DeaMultiplierModel( x, y, rts, orientation)
+  
+  mDEA.x <- x
+  mDEA.y <- y
+  mDEA.rts <- rts
+  mDEA.orientation <- orientation
+  
+  return(mDEA) 
+}
 
 
 # Conduct TFDEA analysis:
