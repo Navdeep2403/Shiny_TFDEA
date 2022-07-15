@@ -53,6 +53,17 @@ shinyServer(function(input, output, session) {
       downloadButton('btn.down.tfdea', 'Download Results')
   })
   
+  # Shows download button after TFDEA analysis
+  output$btn.dea <- renderUI({
+    if (length(get.result()$dea) != 0)
+      downloadButton('btn.down.dea', 'Download Results')
+  })
+  
+  # Shows download button after TFDEA analysis
+  output$btn.mdea <- renderUI({
+    if (length(get.result()$mdea) != 0)
+      downloadButton('btn.down.mdea', 'Download Results')
+  })
   
   # Saves TFDEA results to csv file when button pressed
   output$btn.down.tfdea <- downloadHandler(
@@ -62,7 +73,41 @@ shinyServer(function(input, output, session) {
     content = function(file) {
       df <- get.result()$tfdea
       tryCatch(
-        WriteXLS('df', file, row.names = TRUE, AdjWidth = TRUE, 
+        WriteXLS(df, file, row.names = TRUE, AdjWidth = TRUE, 
+                 BoldHeaderRow = TRUE, verbose = TRUE),
+        error = function(e) { set.error(paste("Error downloading results to xls file:", e)) 
+          return(NULL) })
+    },
+    contentType = "application/vnd.ms-excel"
+  )
+  
+  # Saves DEA results to csv file when button pressed
+  output$btn.down.dea <- downloadHandler(
+    filename = function() {
+      paste0('dearesults-', Sys.Date(), '.xls')
+    },
+    content = function(file) {
+      df <- data.frame(Reduce(rbind, get.result()$dea$eff))
+      print(df)
+      tryCatch(
+        WriteXLS(df, file, row.names = TRUE, AdjWidth = TRUE, 
+                 BoldHeaderRow = TRUE, verbose = TRUE),
+        error = function(e) { print(e) 
+          return(NULL) })
+    },
+    contentType = "application/vnd.ms-excel"
+  )
+  
+  
+  # Saves MultiplierDEA results to csv file when button pressed
+  output$btn.down.mdea <- downloadHandler(
+    filename = function() {
+      paste0('multipier-dearesults-', Sys.Date(), '.xls')
+    },
+    content = function(file) {
+      df <- data.frame(Reduce(rbind, get.result()$mdea$Efficiency))
+      tryCatch(
+        WriteXLS(df, file, row.names = TRUE, AdjWidth = TRUE, 
                  BoldHeaderRow = TRUE, verbose = TRUE),
         error = function(e) { set.error(paste("Error downloading results to xls file:", e)) 
           return(NULL) })
