@@ -18,7 +18,7 @@ library(shinyIncubator)     # Required for additional Shiny options
 library(RCurl)              # Required for obtaining data from Google spreadsheets 
 library(TFDEA)              # Required for TFDEA analysis
 library(Benchmarking)       # Required for DEA analysis
-library(WriteXLS)           # Required for Writing results to an XLS spreadsheet
+library(writexl)           # Required for Writing results to an XLS spreadsheet
 library(car)
 library(ggvis)              # Required for plotting results
 library(googlesheets4)      # Required for reading from Google Sheets

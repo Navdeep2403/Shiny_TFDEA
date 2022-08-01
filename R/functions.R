@@ -238,8 +238,16 @@ dea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "output
   DEA.y <- y
   DEA.rts <- rts
   DEA.orientation <- orientation
+  
+  list.result <- list(eff = DEA$eff, 
+                      lambda = DEA$lambda,
+                      objval = DEA$objval,
+                      exportlist = list(eff = data.frame(DEA$eff),
+                                        lambda = data.frame(DEA$lambda),
+                                        objval = data.frame(DEA$objval)
+                                        ))
 
-  return(DEA) 
+  return(list.result) 
 }
 
 
@@ -308,7 +316,30 @@ mdea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "outpu
   mDEA.rts <- rts
   mDEA.orientation <- orientation
   
-  return(mDEA) 
+  list.result <- list(Efficiency = mDEA$Efficiency, 
+                      Lambda = mDEA$Lambda,
+                      Model_Status  = mDEA$Model_Status,
+                      vx = mDEA$vx,
+                      uy = mDEA$uy,
+                      Free_Weights = mDEA$Free_Weights,
+                      InputValues = mDEA$InputValues,
+                      OutputValues = mDEA$OutputValues,
+                      HCU_Input = mDEA$HCU_Input,
+                      HCU_Output = mDEA$HCU_Output,
+                      exportlist = list(Efficiency = data.frame(mDEA$Efficiency),
+                                        Lambda = data.frame(mDEA$Lambda),
+                                        Model_Status  = data.frame(mDEA$Model_Status),
+                                        vx = data.frame(mDEA$vx),
+                                        uy = data.frame(mDEA$uy),
+                                        Free_Weights = data.frame(mDEA$Free_Weights),
+                                        InputValues = data.frame(mDEA$InputValues),
+                                        OutputValues = data.frame(mDEA$OutputValues),
+                                        HCU_Input = data.frame(mDEA$HCU_Input),
+                                        HCU_Output = data.frame(mDEA$HCU_Output)
+                                        )
+                      )
+  
+  return(list.result)
 }
 
 

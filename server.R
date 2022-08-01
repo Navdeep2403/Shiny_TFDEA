@@ -7,7 +7,7 @@
 #******************************************************************************
 
 shinyServer(function(input, output, session) {
-  
+
   # Loads external R files
   source("R/server.vars.R", local=TRUE)$value # Variables used among reactive expressions and functions in server.R 
   # source("R/tables.R", local=TRUE)$value      # Sortable datatables displaying data and results
@@ -68,13 +68,14 @@ shinyServer(function(input, output, session) {
   # Saves TFDEA results to csv file when button pressed
   output$btn.down.tfdea <- downloadHandler(
     filename = function() {
-      paste0('tfdearesults-', Sys.Date(), '.xls')
+      paste0('tfdearesults-', Sys.Date(), '.xlsx')
     },
     content = function(file) {
       df <- get.result()$tfdea
       tryCatch(
-        WriteXLS(df, file, row.names = TRUE, AdjWidth = TRUE, 
-                 BoldHeaderRow = TRUE, verbose = TRUE),
+        writexl::write_xlsx(df, file , col_names = TRUE, format_headers = TRUE),
+        # WriteXLS(df, ExcelFileName = file, row.names = TRUE, AdjWidth = TRUE,
+        #          BoldHeaderRow = TRUE, verbose = TRUE),
         error = function(e) { set.error(paste("Error downloading results to xls file:", e)) 
           return(NULL) })
     },
@@ -84,14 +85,12 @@ shinyServer(function(input, output, session) {
   # Saves DEA results to csv file when button pressed
   output$btn.down.dea <- downloadHandler(
     filename = function() {
-      paste0('dearesults-', Sys.Date(), '.xls')
+      paste0('dearesults-', Sys.Date(), '.xlsx')
     },
     content = function(file) {
-      df <- data.frame(Reduce(rbind, get.result()$dea$eff))
-      print(df)
+      df <- get.result()$dea$exportlist
       tryCatch(
-        WriteXLS(df, file, row.names = TRUE, AdjWidth = TRUE, 
-                 BoldHeaderRow = TRUE, verbose = TRUE),
+        writexl::write_xlsx(df, file , col_names = TRUE, format_headers = TRUE),
         error = function(e) { print(e) 
           return(NULL) })
     },
@@ -102,13 +101,12 @@ shinyServer(function(input, output, session) {
   # Saves MultiplierDEA results to csv file when button pressed
   output$btn.down.mdea <- downloadHandler(
     filename = function() {
-      paste0('multipier-dearesults-', Sys.Date(), '.xls')
+      paste0('multipier-dearesults-', Sys.Date(), '.xlsx')
     },
     content = function(file) {
-      df <- data.frame(Reduce(rbind, get.result()$mdea$Efficiency))
+      df <- get.result()$mdea$exportlist
       tryCatch(
-        WriteXLS(df, file, row.names = TRUE, AdjWidth = TRUE, 
-                 BoldHeaderRow = TRUE, verbose = TRUE),
+        writexl::write_xlsx(df, file , col_names = TRUE, format_headers = TRUE),
         error = function(e) { set.error(paste("Error downloading results to xls file:", e)) 
           return(NULL) })
     },
@@ -126,13 +124,12 @@ shinyServer(function(input, output, session) {
   # Saves LR results to csv file when button pressed
   output$btn.down.lr <- downloadHandler(
     filename = function() {
-      paste0('lrresults-', Sys.Date(), '.xls')
+      paste0('lrresults-', Sys.Date(), '.xlsx')
     },
     content = function(file) {
       df <- get.result()$lr
       tryCatch(
-        WriteXLS('df', file, row.names = TRUE, AdjWidth = TRUE, 
-                 BoldHeaderRow = TRUE, verbose = TRUE),
+        writexl::write_xlsx(df, file , col_names = TRUE, format_headers = TRUE),
         error = function(e) { set.error(paste("Error downloading results to xls file:", e)) 
           return(NULL) })
     },
@@ -244,55 +241,55 @@ shinyServer(function(input, output, session) {
                     lengthMenu = c(10, 20, 30), pageLength = 10))
   
   # Display DEA efficiency results
-  output$dt.dea.RTS <- renderDataTable({
-    df <- get.df()
-    result <- get.result()
-    if (length(result$dea$RTS) == 0)
-      return(NULL)
-    
-    table <- result$dea$RTS
-    table <- format(table, nsmall = 2)
-    
-    # renderDataTable does not show row names or numbers, so need to append both
-    table <- cbind(seq(nrow(df)), rownames(table), table) 
-    names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
-    return(table)
-  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
-                    lengthMenu = c(10, 20, 30), pageLength = 10))
-  
-  # Display DEA efficiency results
-  output$dt.dea.ORIENTATION <- renderDataTable({
-    df <- get.df()
-    result <- get.result()
-    if (length(result$dea$ORIENTATION) == 0)
-      return(NULL)
-    
-    table <- result$dea$ORIENTATION
-    table <- format(table, nsmall = 2)
-    
-    # renderDataTable does not show row names or numbers, so need to append both
-    table <- cbind(seq(nrow(df)), rownames(table), table) 
-    names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
-    return(table)
-  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
-                    lengthMenu = c(10, 20, 30), pageLength = 10))
-  
-  # Display DEA efficiency results
-  output$dt.dea.TRANSPOSE <- renderDataTable({
-    df <- get.df()
-    result <- get.result()
-    if (length(result$dea$TRANSPOSE) == 0)
-      return(NULL)
-    
-    table <- result$dea$TRANSPOSE
-    table <- format(table, nsmall = 2)
-    
-    # renderDataTable does not show row names or numbers, so need to append both
-    table <- cbind(seq(nrow(df)), rownames(table), table) 
-    names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
-    return(table)
-  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
-                    lengthMenu = c(10, 20, 30), pageLength = 10))
+  # output$dt.dea.RTS <- renderDataTable({
+  #   df <- get.df()
+  #   result <- get.result()
+  #   if (length(result$dea$RTS) == 0)
+  #     return(NULL)
+  #   
+  #   table <- result$dea$RTS
+  #   table <- format(table, nsmall = 2)
+  #   
+  #   # renderDataTable does not show row names or numbers, so need to append both
+  #   table <- cbind(seq(nrow(df)), rownames(table), table) 
+  #   names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
+  #   return(table)
+  # }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+  #                   lengthMenu = c(10, 20, 30), pageLength = 10))
+  # 
+  # # Display DEA efficiency results
+  # output$dt.dea.ORIENTATION <- renderDataTable({
+  #   df <- get.df()
+  #   result <- get.result()
+  #   if (length(result$dea$ORIENTATION) == 0)
+  #     return(NULL)
+  #   
+  #   table <- result$dea$ORIENTATION
+  #   table <- format(table, nsmall = 2)
+  #   
+  #   # renderDataTable does not show row names or numbers, so need to append both
+  #   table <- cbind(seq(nrow(df)), rownames(table), table) 
+  #   names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
+  #   return(table)
+  # }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+  #                   lengthMenu = c(10, 20, 30), pageLength = 10))
+  # 
+  # # Display DEA efficiency results
+  # output$dt.dea.TRANSPOSE <- renderDataTable({
+  #   df <- get.df()
+  #   result <- get.result()
+  #   if (length(result$dea$TRANSPOSE) == 0)
+  #     return(NULL)
+  #   
+  #   table <- result$dea$TRANSPOSE
+  #   table <- format(table, nsmall = 2)
+  #   
+  #   # renderDataTable does not show row names or numbers, so need to append both
+  #   table <- cbind(seq(nrow(df)), rownames(table), table) 
+  #   names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
+  #   return(table)
+  # }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+  #                   lengthMenu = c(10, 20, 30), pageLength = 10))
   
   # mDEA - Start
   
@@ -329,6 +326,143 @@ shinyServer(function(input, output, session) {
     return(table)
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
                     lengthMenu = c(10, 20, 30), pageLength = 10))
+  
+  
+  output$dt.mdea.Free_Weights <- renderDataTable({
+    df <- get.df()
+    result <- get.result()
+    if (length(result$mdea$Free_Weights) == 0)
+      return(NULL)
+    
+    table <- result$mdea$Free_Weights
+    table <- format(table, nsmall = 2)
+    
+    # renderDataTable does not show row names or numbers, so need to append both
+    table <- cbind(seq(nrow(df)), rownames(table), table)
+    names(table) <- c("ROW", "DMU", toupper(names(result$mdea))) 
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    lengthMenu = c(10, 20, 30), pageLength = 10))
+  
+  
+  output$dt.mdea.Model_Status <- renderDataTable({
+    df <- get.df()
+    result <- get.result()
+    print(result$mdea$Model_Status)
+    browser()
+    if (length(result$mdea$Model_Status) == 0)
+      return(NULL)
+    
+    table <- result$mdea$Model_Status
+    table <- format(table, nsmall = 2)
+    
+    # renderDataTable does not show row names or numbers, so need to append both
+    table <- cbind(seq(nrow(df)), rownames(table), table)
+    print(table)
+    print(names(result$mdea))
+    names(table) <- c("ROW", "DMU", "CODE", "DESCRIPTION") 
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    lengthMenu = c(10, 20, 30), pageLength = 10))
+  
+  output$dt.mdea.InputValues <- renderDataTable({
+    df <- get.df()
+    result <- get.result()
+    if (length(result$mdea$InputValues) == 0)
+      return(NULL)
+    
+    table <- result$mdea$InputValues
+    table <- format(table, nsmall = 2)
+    
+    # renderDataTable does not show row names or numbers, so need to append both
+    table <- cbind(seq(nrow(df)), rownames(table), table)
+    names(table) <- c("ROW", "DMU", toupper(names(result$mdea))) 
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    lengthMenu = c(10, 20, 30), pageLength = 10))
+  
+  output$dt.mdea.OutputValues <- renderDataTable({
+    df <- get.df()
+    result <- get.result()
+    if (length(result$mdea$OutputValues) == 0)
+      return(NULL)
+    
+    table <- result$mdea$OutputValues
+    table <- format(table, nsmall = 2)
+    
+    # renderDataTable does not show row names or numbers, so need to append both
+    table <- cbind(seq(nrow(df)), rownames(table), table)
+    names(table) <- c("ROW", "DMU", toupper(names(result$mdea))) 
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    lengthMenu = c(10, 20, 30), pageLength = 10))
+
+  output$dt.mdea.HCU_Input <- renderDataTable({
+    df <- get.df()
+    result <- get.result()
+    if (length(result$mdea$HCU_Input) == 0)
+      return(NULL)
+    
+    table <- result$mdea$HCU_Input
+    table <- format(table, nsmall = 2)
+    
+    # renderDataTable does not show row names or numbers, so need to append both
+    table <- cbind(seq(nrow(df)), rownames(table), table)
+    names(table) <- c("ROW", "DMU", toupper(names(result$mdea))) 
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    lengthMenu = c(10, 20, 30), pageLength = 10))
+  
+  output$dt.mdea.HCU_Output <- renderDataTable({
+    df <- get.df()
+    result <- get.result()
+    if (length(result$mdea$HCU_Output) == 0)
+      return(NULL)
+    
+    table <- result$mdea$HCU_Output
+    table <- format(table, nsmall = 2)
+    
+    # renderDataTable does not show row names or numbers, so need to append both
+    table <- cbind(seq(nrow(df)), rownames(table), table)
+    names(table) <- c("ROW", "DMU", toupper(names(result$mdea))) 
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    lengthMenu = c(10, 20, 30), pageLength = 10))
+  
+  output$dt.mdea.vx <- renderDataTable({
+    df <- get.df()
+    result <- get.result()
+    if (length(result$mdea$vx) == 0)
+      return(NULL)
+    
+    table <- result$mdea$vx
+    table <- format(table, nsmall = 2)
+    
+    # renderDataTable does not show row names or numbers, so need to append both
+    table <- cbind(seq(nrow(df)), rownames(table), table)
+    names(table) <- c("ROW", "DMU", toupper(names(result$mdea))) 
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    lengthMenu = c(10, 20, 30), pageLength = 10))
+  
+  output$dt.mdea.uy <- renderDataTable({
+    df <- get.df()
+    result <- get.result()
+    if (length(result$mdea$uy) == 0)
+      return(NULL)
+    
+    table <- result$mdea$uy
+    table <- format(table, nsmall = 2)
+    
+    # renderDataTable does not show row names or numbers, so need to append both
+    table <- cbind(seq(nrow(df)), rownames(table), table)
+    names(table) <- c("ROW", "DMU", toupper(names(result$mdea))) 
+    return(table)
+  }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
+                    lengthMenu = c(10, 20, 30), pageLength = 10))
+  
+  
+  
   
   # # Display DEA efficiency results
   # output$dt.dea.objval <- renderDataTable({
