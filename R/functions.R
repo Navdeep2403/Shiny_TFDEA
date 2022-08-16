@@ -179,16 +179,8 @@ populate.options <- function(df) {
 # Conduct DEA analysis:
 # Parameters:
 # df                          -> uploaded data
-# inputs/outputs              -> TFDEA inputs and outputs
-# intro.date                  -> date of introduction column
-# front.date                  -> frontier date
-# rts/orientation             -> returns to scale and orientation of TFDEA model
-# secondary.obj/frontier.type -> secondary objective and frontier type of TFDEA model
-# segroc                      -> segmented rate of change
-# Return:
-# Forecast                    -> forecasted dates, ROCs, and efficiencies
-# Model                       -> TFDEA parameters used for the analysis
-# Summary                     -> MAD, Average ROC, ROC contributors, and other relevant information 
+# inputs/outputs              -> DEA inputs and outputs
+# rts/orientation             -> returns to scale and orientation of DEA model
 dea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "output") {
   
   print("Inside dea.analysis")
@@ -233,7 +225,6 @@ dea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "output
   
   DEA <- dea(X = x, Y = y, RTS = rts, ORIENTATION = orientation)
   
-  # DEA.plot <- dea.plot(x, y, RTS = rts, ORIENTATION = orientation, txt=LETTERS[1:length(x)])
   DEA.x <- x
   DEA.y <- y
   DEA.rts <- rts
@@ -251,19 +242,11 @@ dea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "output
 }
 
 
-# Conduct DEA analysis:
+# Conduct Multiplier-DEA analysis:
 # Parameters:
 # df                          -> uploaded data
 # inputs/outputs              -> TFDEA inputs and outputs
-# intro.date                  -> date of introduction column
-# front.date                  -> frontier date
 # rts/orientation             -> returns to scale and orientation of TFDEA model
-# secondary.obj/frontier.type -> secondary objective and frontier type of TFDEA model
-# segroc                      -> segmented rate of change
-# Return:
-# Forecast                    -> forecasted dates, ROCs, and efficiencies
-# Model                       -> TFDEA parameters used for the analysis
-# Summary                     -> MAD, Average ROC, ROC contributors, and other relevant information 
 mdea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "output") {
   
   print("Inside mdea.analysis")

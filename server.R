@@ -240,60 +240,10 @@ shinyServer(function(input, output, session) {
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
                     lengthMenu = c(10, 20, 30), pageLength = 10))
   
-  # Display DEA efficiency results
-  # output$dt.dea.RTS <- renderDataTable({
-  #   df <- get.df()
-  #   result <- get.result()
-  #   if (length(result$dea$RTS) == 0)
-  #     return(NULL)
-  #   
-  #   table <- result$dea$RTS
-  #   table <- format(table, nsmall = 2)
-  #   
-  #   # renderDataTable does not show row names or numbers, so need to append both
-  #   table <- cbind(seq(nrow(df)), rownames(table), table) 
-  #   names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
-  #   return(table)
-  # }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
-  #                   lengthMenu = c(10, 20, 30), pageLength = 10))
-  # 
-  # # Display DEA efficiency results
-  # output$dt.dea.ORIENTATION <- renderDataTable({
-  #   df <- get.df()
-  #   result <- get.result()
-  #   if (length(result$dea$ORIENTATION) == 0)
-  #     return(NULL)
-  #   
-  #   table <- result$dea$ORIENTATION
-  #   table <- format(table, nsmall = 2)
-  #   
-  #   # renderDataTable does not show row names or numbers, so need to append both
-  #   table <- cbind(seq(nrow(df)), rownames(table), table) 
-  #   names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
-  #   return(table)
-  # }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
-  #                   lengthMenu = c(10, 20, 30), pageLength = 10))
-  # 
-  # # Display DEA efficiency results
-  # output$dt.dea.TRANSPOSE <- renderDataTable({
-  #   df <- get.df()
-  #   result <- get.result()
-  #   if (length(result$dea$TRANSPOSE) == 0)
-  #     return(NULL)
-  #   
-  #   table <- result$dea$TRANSPOSE
-  #   table <- format(table, nsmall = 2)
-  #   
-  #   # renderDataTable does not show row names or numbers, so need to append both
-  #   table <- cbind(seq(nrow(df)), rownames(table), table) 
-  #   names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
-  #   return(table)
-  # }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
-  #                   lengthMenu = c(10, 20, 30), pageLength = 10))
-  
+
   # mDEA - Start
   
-  # Display DEA efficiency results
+  # Display mDEA efficiency results
   output$dt.mdea.Efficiency <- renderDataTable({
     df <- get.df()
     result <- get.result()
@@ -310,7 +260,7 @@ shinyServer(function(input, output, session) {
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
                     lengthMenu = c(10, 20, 30), pageLength = 10))
   
-  # Display DEA efficiency results
+  # Display mDEA Lambda results
   output$dt.mdea.Lambda <- renderDataTable({
     df <- get.df()
     result <- get.result()
@@ -328,6 +278,7 @@ shinyServer(function(input, output, session) {
                     lengthMenu = c(10, 20, 30), pageLength = 10))
   
   
+  # Display mDEA Free Weight results
   output$dt.mdea.Free_Weights <- renderDataTable({
     df <- get.df()
     result <- get.result()
@@ -344,12 +295,11 @@ shinyServer(function(input, output, session) {
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
                     lengthMenu = c(10, 20, 30), pageLength = 10))
   
-  
+  # Display mDEA Model Status
   output$dt.mdea.Model_Status <- renderDataTable({
     df <- get.df()
     result <- get.result()
     print(result$mdea$Model_Status)
-    browser()
     if (length(result$mdea$Model_Status) == 0)
       return(NULL)
     
@@ -365,6 +315,7 @@ shinyServer(function(input, output, session) {
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
                     lengthMenu = c(10, 20, 30), pageLength = 10))
   
+  # Display mDEA Input Values
   output$dt.mdea.InputValues <- renderDataTable({
     df <- get.df()
     result <- get.result()
@@ -381,6 +332,7 @@ shinyServer(function(input, output, session) {
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
                     lengthMenu = c(10, 20, 30), pageLength = 10))
   
+  # Display mDEA Output Values
   output$dt.mdea.OutputValues <- renderDataTable({
     df <- get.df()
     result <- get.result()
@@ -397,6 +349,7 @@ shinyServer(function(input, output, session) {
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
                     lengthMenu = c(10, 20, 30), pageLength = 10))
 
+  # Display mDEA HCU Input
   output$dt.mdea.HCU_Input <- renderDataTable({
     df <- get.df()
     result <- get.result()
@@ -413,6 +366,7 @@ shinyServer(function(input, output, session) {
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
                     lengthMenu = c(10, 20, 30), pageLength = 10))
   
+  # Display mDEA HCU Output
   output$dt.mdea.HCU_Output <- renderDataTable({
     df <- get.df()
     result <- get.result()
@@ -429,6 +383,7 @@ shinyServer(function(input, output, session) {
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
                     lengthMenu = c(10, 20, 30), pageLength = 10))
   
+  # Display mDEA vx
   output$dt.mdea.vx <- renderDataTable({
     df <- get.df()
     result <- get.result()
@@ -445,6 +400,7 @@ shinyServer(function(input, output, session) {
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
                     lengthMenu = c(10, 20, 30), pageLength = 10))
   
+  # Display mDEA uy
   output$dt.mdea.uy <- renderDataTable({
     df <- get.df()
     result <- get.result()
@@ -460,77 +416,6 @@ shinyServer(function(input, output, session) {
     return(table)
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
                     lengthMenu = c(10, 20, 30), pageLength = 10))
-  
-  
-  
-  
-  # # Display DEA efficiency results
-  # output$dt.dea.objval <- renderDataTable({
-  #   df <- get.df()
-  #   result <- get.result()
-  #   if (length(result$dea$objval) == 0)
-  #     return(NULL)
-  #   
-  #   table <- result$dea$objval
-  #   table <- format(table, nsmall = 2)
-  #   
-  #   # renderDataTable does not show row names or numbers, so need to append both
-  #   table <- cbind(seq(nrow(df)), rownames(table), table) 
-  #   names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
-  #   return(table)
-  # }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
-  #                   lengthMenu = c(10, 20, 30), pageLength = 10))
-  # 
-  # # Display DEA efficiency results
-  # output$dt.dea.RTS <- renderDataTable({
-  #   df <- get.df()
-  #   result <- get.result()
-  #   if (length(result$dea$RTS) == 0)
-  #     return(NULL)
-  #   
-  #   table <- result$dea$RTS
-  #   table <- format(table, nsmall = 2)
-  #   
-  #   # renderDataTable does not show row names or numbers, so need to append both
-  #   table <- cbind(seq(nrow(df)), rownames(table), table) 
-  #   names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
-  #   return(table)
-  # }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
-  #                   lengthMenu = c(10, 20, 30), pageLength = 10))
-  # 
-  # # Display DEA efficiency results
-  # output$dt.dea.ORIENTATION <- renderDataTable({
-  #   df <- get.df()
-  #   result <- get.result()
-  #   if (length(result$dea$ORIENTATION) == 0)
-  #     return(NULL)
-  #   
-  #   table <- result$dea$ORIENTATION
-  #   table <- format(table, nsmall = 2)
-  #   
-  #   # renderDataTable does not show row names or numbers, so need to append both
-  #   table <- cbind(seq(nrow(df)), rownames(table), table) 
-  #   names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
-  #   return(table)
-  # }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
-  #                   lengthMenu = c(10, 20, 30), pageLength = 10))
-  # 
-  # # Display DEA efficiency results
-  # output$dt.dea.TRANSPOSE <- renderDataTable({
-  #   df <- get.df()
-  #   result <- get.result()
-  #   if (length(result$dea$TRANSPOSE) == 0)
-  #     return(NULL)
-  #   
-  #   table <- result$dea$TRANSPOSE
-  #   table <- format(table, nsmall = 2)
-  #   
-  #   # renderDataTable does not show row names or numbers, so need to append both
-  #   table <- cbind(seq(nrow(df)), rownames(table), table) 
-  #   names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
-  #   return(table)
-  # }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
-  #                   lengthMenu = c(10, 20, 30), pageLength = 10))
   
   # mDEA - End
   
@@ -625,13 +510,6 @@ shinyServer(function(input, output, session) {
     # input$btn.display increases by 1 each time the button is pressed
     if (input$btn.display != 0){
       isolate({
-        # Disable buttons to prevent user interaction
-        # elem.disable("btn", TRUE, TRUE)
-        
-        # Upload data and show progress bar
-#         withProgress(session, {
-#           setProgress(message = 'Uploading Data',
-#                       detail = 'This may take a while...')
 
           data.location <- switch(input$fsource,
                                   local = input$data.file,
@@ -814,23 +692,13 @@ shinyServer(function(input, output, session) {
     # display the results in the appropriate tables
     if (input$btn.tfdeaanalysis != 0 && get.model() == "tfdea"){
       
-      # Disable buttons to prevent user interaction
-      #         elem.disable("btn", TRUE, TRUE)
-      
-      # Calculate results and show progress bar
-      #         withProgress(session, {
-      #           setProgress(message = 'Calculation in Progress',
-      #                       detail = 'This may take a while...')
+
       isolate({
         # Get uploaded data saved in the global server df dataframe
         df <- get.df()
         
         print("Inside TFDEA Analysis")
         
-        # Run TFDEA analysis with selected parameters (location: function.R)
-        # tfdea <- tfdea.analysis(df, input$tfdea.inputs, input$tfdea.outputs, input$intro.date, 
-        #                         input$front.date, input$rts, input$orientation, input$secondary.obj,
-        #                         input$frontier.type, input$segroc)
         tfdea <- tfdea.analysis(df, input$tfdea.inputs, input$tfdea.outputs, input$intro.date,
                                 input$front.date, input$rts, input$orientation, input$secondary.obj,
                                 input$frontier.type, input$segroc)
