@@ -37,7 +37,7 @@ file.source.opts <- list(Local = 'local')
 file.sep.opts <- list(Comma = ',', Semicolon = ';', Tab = '\t')
 # file.quote.opts <- list(None = 'none', 'Single Quote' = 'single', 'Double Quote' = 'double')
 file.quote.opts <- list(None = '', 'Single Quote' = "'", 'Double Quote' = '"')
-accepted.files <- c('.csv','text/csv', 'text/comma-separated-values','text/plain')
+accepted.files <- c('.csv','text/csv', 'text/comma-separated-values','text/plain', '.xlsx')
 
 # Default URL for dropbox and google spreadsheet files when app loads. Links are currently for Fighter jet data
 # (used in ui.R)
