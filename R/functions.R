@@ -241,6 +241,58 @@ dea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "output
   return(list.result) 
 }
 
+# Conduct Multiplier-DEA analysis with input orientation: 
+# Parameters: 
+# df                          -> uploaded data 
+# inputs/outputs              -> TFDEA inputs and outputs 
+# rts/orientation             -> returns to scale and orientation of TFDEA model 
+# mdea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "input") { 
+   
+#   print("Inside mdea.analysis") 
+#   # Check parameter values 
+#   if (length(input$mdea.inputs) == 0) { 
+#     set.error("No input(s) selected. Select a minimum of 1 input")  
+#     return(NULL)  
+#   } 
+#   if (length(input$mdea.outputs) == 0) { 
+#     set.error("No output(s) selected. Select a minimum of 1 output")  
+#     return(NULL)  
+#   } 
+#   if (nrow(df) == 0) { 
+#     set.error("No data exists in selected data file")  
+#     return(NULL)  
+#   } 
+   
+#   dmu.count <- nrow(df) 
+#   dmu.names <- row.names(df) 
+#   # Create vector of all 1's for constant 
+#   constant <- rep(1, dmu.count) 
+   
+#   # Check if constant_1 was selected and if so append to inputs/outputs 
+#   x.constant <- match("Constant_1", inputs) 
+#   y.constant <- match("Constant_1", outputs) 
+#   if (!is.na(x.constant))   
+#     x <- cbind(constant, df[inputs[-x.constant]]) 
+#   else                             
+#     x <- df[inputs] 
+   
+#   if (!is.na(y.constant))   
+#     y <- cbind(constant, df[outputs[-y.constant]]) 
+#   else                             
+#     y <- df[outputs] 
+#     y <- df[outputs] 
+   
+#   # Assign names to inputs and outputs 
+#   colnames(x) <- toupper(paste('x', colnames(x), sep='_')) 
+#   colnames(y) <- toupper(paste('y', colnames(y), sep='_')) 
+   
+#   orientation <- "output" 
+   
+#   print(x) 
+#   print(y) 
+#   print(rts) 
+#   print(orientation) 
+ 
 
 # Conduct Multiplier-DEA analysis:
 # Parameters:
