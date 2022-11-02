@@ -661,8 +661,16 @@ shinyServer(function(input, output, session) {
         df <- get.df()
         
         print("Inside MultiplierDEA Analysis")
-      
-        mdea <- mdea.analysis(df, input$mdea.inputs, input$mdea.outputs, input$rts, input$orientation)
+
+        weightRestriction<-data.frame(lower = c(input$mdea.wr_lb), 
+                                      numerator = input$mdea.wr_num,
+                                      denominator = input$mdea.wr_denom,
+                                      upper = c(input$mdea.wr_ub))
+        
+        print(weightRestriction)
+        mdea <- mdea.analysis(df, input$mdea.inputs, input$mdea.outputs, input$rts, input$orientation, weightRestriction)
+        print("Inside MultiplierDEA Analysis")
+        print(mdea)
         
         set.result.mdea(mdea)
         set.result.dea(list())
@@ -741,6 +749,8 @@ shinyServer(function(input, output, session) {
     # Get TFDEA and linear regression results saved in the global server results list
     result <- get.result()
     # Plot results(location: plots.R)
+    
+    print("Inside Plot results section:2")
     plot.result(result$lr, result$tfdea, result$dea, result$mdea)
   })
   
@@ -749,6 +759,7 @@ shinyServer(function(input, output, session) {
   # inputs and outputs
   observe({
     if (input$intro.date != "NONE"){
+      print("Inside Observe:1")
       
       # Get uploaded data saved in the global server df dataframe
       df <- get.df()
@@ -762,24 +773,55 @@ shinyServer(function(input, output, session) {
         col.names <- colnames(df[, col.numeric], do.NULL = TRUE)
       
       # Exclude column that is already selected for the introduction date
-      col.names <- col.names[which(col.names != input$intro.date)]
+      # col.names <- col.names[which(col.names != input$intro.date)]
       
       # Include all the remaining columns as input and output options
       col.names.in <- col.names
       col.names.out <- col.names
       
+      print("col.names.in")
+      print(col.names.in)
+      
+      print("col.names.out")
+      print(col.names.out)
+      
+      
+      # wr_num_cols <- col.names[which(col.names != input$mdea.wr_denom)]
+      # wr_denom_cols <- col.names[which(col.names != input$mdea.wr_num)]
+      
       # If the orientation is output, only allow Constant_1 as an input selection,
       # and vice-versa
-      if (input$orientation == "out")
-        col.names.in <- c("Constant_1", col.names)
-      if (input$orientation == "in")
-        col.names.out <- c("Constant_1", col.names)
+      # if (input$orientation == "out")
+      #   col.names.in <- c("Constant_1", col.names)
+      # if (input$orientation == "in")
+      #   col.names.out <- c("Constant_1", col.names)
       
-      # Update the options for inputs and outputs
+      # Update the options for inputs and outputs for TFDEA
       updateSelectInput(session, 'tfdea.inputs', 'Select Input(s):', 
                         col.names.in)
       updateSelectInput(session, 'tfdea.outputs', 'Select Output(s):', 
                         col.names.out)
+      
+      # Update the options for inputs and outputs for DEA
+      updateSelectInput(session, 'dea.inputs', 'Select Input(s):', 
+                        col.names.in)
+      updateSelectInput(session, 'dea.outputs', 'Select Output(s):', 
+                        col.names.out)
+      
+      # Update the options for inputs and outputs for Multiplier DEA
+      updateSelectInput(session, 'mdea.inputs', 'Select Input(s):', 
+                        col.names.in)
+      updateSelectInput(session, 'mdea.outputs', 'Select Output(s):', 
+                        col.names.out)
+      # 
+      # print("Inside Observe:2")
+      # # Update the options for Weight Restriction in Multiplier DEA
+      # updateSelectInput(session, 'mdea.wr_num', 'Select Numerator Column:',
+      #                   wr_num_cols)
+      # updateSelectInput(session, 'mdea.wr_denom', 'Select Denominator Column:',
+      #                   wr_denom_cols)
+      # 
+      
     }
 
   }) # observe intro.date

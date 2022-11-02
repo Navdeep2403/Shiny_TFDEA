@@ -68,7 +68,7 @@ plot.result <- function(lr, tfdea, dea, mdea) {
   }
   else if(length(dea) != 0) {
       print("DEA results non-empty")
-      eff <- round(dea$eff, digits = 1)
+      eff <- round(dea$eff, digits = 3)
 
       # Create a dataframe with all the data to be plotted
       plot.data <- data.frame(rownames(data.frame(eff)), eff)
@@ -84,7 +84,7 @@ plot.result <- function(lr, tfdea, dea, mdea) {
   }
   else if(length(mdea) != 0) {
     print("MULTIPLIER_DEA results non-empty")
-    eff <- round(mdea$Efficiency, digits = 1)
+    eff <- round(mdea$Efficiency, digits = 3)
     
     # Create a dataframe with all the data to be plotted
     plot.data <- data.frame(rownames(data.frame(eff)), eff)

@@ -154,8 +154,11 @@ populate.options <- function(df) {
     return()
   }
   
+  print("Uniq")
+  print(col.names)
+  
   # Update selectInputs with names of numeric columns, with the addition of constant_1
-  col.names <- c("Constant_1", col.names)
+  # col.names <- c("Constant_1", col.names)
   #tfdea
   updateSelectInput(session, 'tfdea.inputs', 'Select Input(s):', 
                     col.names, selected = NULL)
@@ -164,15 +167,22 @@ populate.options <- function(df) {
   updateSelectInput(session, 'intro.date', 'Select Year of Introduction:', 
                     col.names[-1])
   #dea
-  updateSelectInput(session, 'dea.inputs', 'Select Input(s):', 
+  updateSelectInput(session, 'dea.inputs', 'Select Input:', 
                     col.names, selected = NULL)
-  updateSelectInput(session, 'dea.outputs', 'Select Output(s):', 
+  updateSelectInput(session, 'dea.outputs', 'Select Output:', 
                     col.names, selected = NULL)
   #mdea
   updateSelectInput(session, 'mdea.inputs', 'Select Input(s):', 
                     col.names, selected = NULL)
   updateSelectInput(session, 'mdea.outputs', 'Select Output(s):', 
                     col.names, selected = NULL)
+
+  # mdea weight restriction
+  updateSelectInput(session, 'mdea.wr_num', 'Weight Restricition (Numerator) Column:',
+                    col.names, selected = NULL)
+  updateSelectInput(session, 'mdea.wr_denom', 'Weight Restricition  (Denominator) Column:',
+                    col.names, selected = NULL)
+
 }
 
 
@@ -299,7 +309,7 @@ dea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "output
 # df                          -> uploaded data
 # inputs/outputs              -> TFDEA inputs and outputs
 # rts/orientation             -> returns to scale and orientation of TFDEA model
-mdea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "output") {
+mdea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "output", weightRestriction) {
   
   print("Inside mdea.analysis")
   # Check parameter values
@@ -315,6 +325,7 @@ mdea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "outpu
     set.error("No data exists in selected data file") 
     return(NULL) 
   }
+
   
   dmu.count <- nrow(df)
   dmu.names <- row.names(df)
@@ -335,16 +346,19 @@ mdea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "outpu
     y <- df[outputs]
   
   # Assign names to inputs and outputs
-  colnames(x) <- toupper(paste('x', colnames(x), sep='_'))
-  colnames(y) <- toupper(paste('y', colnames(y), sep='_'))
+  # colnames(x) <- toupper(paste('x', colnames(x), sep='_'))
+  # colnames(y) <- toupper(paste('y', colnames(y), sep='_'))
   
   orientation <- "output"
   
+  print("Inside mdea.analysis:2")
+
   print(x)
   print(y)
   print(rts)
   print(orientation)
-  mDEA <- DeaMultiplierModel( x, y, rts, orientation)
+  print(weightRestriction)
+  mDEA <- DeaMultiplierModel( x, y, rts, orientation, weightRestriction)
   
   mDEA.x <- x
   mDEA.y <- y

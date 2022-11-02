@@ -105,10 +105,14 @@ shinyUI(pageWithSidebar(
                          actionButton("btn.deaanalysis","Run DEA Analysis")
                 ),
                 tabPanel("MultiplierDEA Setup Model", value = "ts.setup.mdea_selection",
-                         selectInput('mdea.inputs', 'Select Input(s):', 'NONE'),
-                         selectInput('mdea.outputs', 'Select Output(s):', 'NONE'),
+                         selectInput('mdea.inputs', 'Select Input(s):', 'NONE', multiple = TRUE),
+                         selectInput('mdea.outputs', 'Select Output(s):', 'NONE', multiple = TRUE),
                          selectInput('mdea.orientation', 'Orientation:', orientation.opts),
                          selectInput('mdea.rts', 'Return to Scale:', crs.opts),
+                         selectInput('mdea.wr_num', 'Weight Restriction (Numerator):', 'NONE', multiple = TRUE),
+                         selectInput('mdea.wr_denom', 'Weight Restriction (Denominator):', 'NONE', multiple = TRUE),
+                         numericInput('mdea.wr_lb', 'Weight Restriction (Lower Bound):', 1, min = 1, max = 2),
+                         numericInput('mdea.wr_ub', 'Weight Restriction (Upper Bound):', 2, min = 1, max = 2),
                          br(),
                          actionButton("btn.mdeaanalysis","Run MultiplierDEA Analysis")
                 )
