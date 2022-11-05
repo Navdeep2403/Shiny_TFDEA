@@ -773,7 +773,7 @@ shinyServer(function(input, output, session) {
         col.names <- colnames(df[, col.numeric], do.NULL = TRUE)
       
       # Exclude column that is already selected for the introduction date
-      # col.names <- col.names[which(col.names != input$intro.date)]
+      col.names <- col.names[which(col.names != input$intro.date)]
       
       # Include all the remaining columns as input and output options
       col.names.in <- col.names

@@ -158,7 +158,7 @@ populate.options <- function(df) {
   print(col.names)
   
   # Update selectInputs with names of numeric columns, with the addition of constant_1
-  # col.names <- c("Constant_1", col.names)
+  col.names <- c("Constant_1", col.names)
   #tfdea
   updateSelectInput(session, 'tfdea.inputs', 'Select Input(s):', 
                     col.names, selected = NULL)
