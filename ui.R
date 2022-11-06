@@ -92,7 +92,7 @@ shinyUI(pageWithSidebar(
                          selectInput('rts', 'Return to Scale:', crs.opts),
                          selectInput('frontier.type', 'Frontier Type:', frontier.type.opts),
                          selectInput('secondary.obj', 'Secondary Objective:', secondary.obj.opts),
-                         checkboxInput('segroc', 'Segemented ROC', FALSE),
+                         checkboxInput('segroc', 'Segmented ROC', FALSE),
                          br(),
                          actionButton("btn.tfdeaanalysis","Run TFDEA Analysis")
                 ),

@@ -197,11 +197,11 @@ shinyServer(function(input, output, session) {
       return(NULL)
     
     table <- result$dea$eff
-    table <- format(table, nsmall = 2)
     
     # renderDataTable does not show row names or numbers, so need to append both
-    table <- cbind(seq(nrow(df)), rownames(table), table) 
-    names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
+    table <- cbind(seq(nrow(df)), DMU = rownames(table), Efficiency = table)
+    colnames(table)<-c("DMU", "Efficiency")
+
     return(table)
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
                     lengthMenu = c(10, 20, 30), pageLength = 10))
@@ -217,7 +217,7 @@ shinyServer(function(input, output, session) {
     table <- format(table, nsmall = 2)
     
     # renderDataTable does not show row names or numbers, so need to append both
-    table <- cbind(seq(nrow(df)), rownames(table), table) 
+    table <- cbind(seq(nrow(df)), rownames(table), table)
     names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
     return(table)
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
@@ -235,7 +235,7 @@ shinyServer(function(input, output, session) {
     
     # renderDataTable does not show row names or numbers, so need to append both
     table <- cbind(seq(nrow(df)), rownames(table), table) 
-    names(table) <- c("ROW", "DMU", toupper(names(result$dea))) 
+    colnames(table) <- c("DMU", "Objective Value") 
     return(table)
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
                     lengthMenu = c(10, 20, 30), pageLength = 10))
@@ -253,9 +253,12 @@ shinyServer(function(input, output, session) {
     table <- result$mdea$Efficiency
     table <- format(table, nsmall = 2)
     
+    print(table)
+    
     # renderDataTable does not show row names or numbers, so need to append both
     table <- cbind(seq(nrow(df)), rownames(table), table) 
-    names(table) <- c("ROW", "DMU", toupper(names(result$mdea))) 
+    print(table)
+    colnames(table) <- c("ROW", "DMU", "Efficiency") 
     return(table)
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
                     lengthMenu = c(10, 20, 30), pageLength = 10))
@@ -271,8 +274,8 @@ shinyServer(function(input, output, session) {
     table <- format(table, nsmall = 2)
     
     # renderDataTable does not show row names or numbers, so need to append both
-    table <- cbind(seq(nrow(df)), rownames(table), table)
-    names(table) <- c("ROW", "DMU", toupper(names(result$mdea))) 
+    table <- cbind(ROW = seq(nrow(df)), DMU = rownames(table), table)
+    names(table) <- c("ROW", "DMU", toupper(names(result$mdea$Lambda))) 
     return(table)
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
                     lengthMenu = c(10, 20, 30), pageLength = 10))
@@ -289,7 +292,7 @@ shinyServer(function(input, output, session) {
     table <- format(table, nsmall = 2)
     
     # renderDataTable does not show row names or numbers, so need to append both
-    table <- cbind(seq(nrow(df)), rownames(table), table)
+    table <- cbind(ROW = seq(nrow(df)),DMU = rownames(table), table)
     names(table) <- c("ROW", "DMU", toupper(names(result$mdea))) 
     return(table)
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
@@ -307,7 +310,7 @@ shinyServer(function(input, output, session) {
     table <- format(table, nsmall = 2)
     
     # renderDataTable does not show row names or numbers, so need to append both
-    table <- cbind(seq(nrow(df)), rownames(table), table)
+    table <- cbind(ROW = seq(nrow(df)),DMU = rownames(table), table)
     print(table)
     print(names(result$mdea))
     names(table) <- c("ROW", "DMU", "CODE", "DESCRIPTION") 
@@ -326,7 +329,7 @@ shinyServer(function(input, output, session) {
     table <- format(table, nsmall = 2)
     
     # renderDataTable does not show row names or numbers, so need to append both
-    table <- cbind(seq(nrow(df)), rownames(table), table)
+    table <- cbind(ROW = seq(nrow(df)),DMU = rownames(table), table)
     names(table) <- c("ROW", "DMU", toupper(names(result$mdea))) 
     return(table)
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
@@ -343,7 +346,7 @@ shinyServer(function(input, output, session) {
     table <- format(table, nsmall = 2)
     
     # renderDataTable does not show row names or numbers, so need to append both
-    table <- cbind(seq(nrow(df)), rownames(table), table)
+    table <- cbind(ROW = seq(nrow(df)),DMU = rownames(table), table)
     names(table) <- c("ROW", "DMU", toupper(names(result$mdea))) 
     return(table)
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
@@ -360,7 +363,7 @@ shinyServer(function(input, output, session) {
     table <- format(table, nsmall = 2)
     
     # renderDataTable does not show row names or numbers, so need to append both
-    table <- cbind(seq(nrow(df)), rownames(table), table)
+    table <- cbind(ROW = seq(nrow(df)),DMU = rownames(table), table)
     names(table) <- c("ROW", "DMU", toupper(names(result$mdea))) 
     return(table)
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
@@ -377,7 +380,7 @@ shinyServer(function(input, output, session) {
     table <- format(table, nsmall = 2)
     
     # renderDataTable does not show row names or numbers, so need to append both
-    table <- cbind(seq(nrow(df)), rownames(table), table)
+    table <- cbind(ROW = seq(nrow(df)),DMU = rownames(table), table)
     names(table) <- c("ROW", "DMU", toupper(names(result$mdea))) 
     return(table)
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
@@ -394,7 +397,7 @@ shinyServer(function(input, output, session) {
     table <- format(table, nsmall = 2)
     
     # renderDataTable does not show row names or numbers, so need to append both
-    table <- cbind(seq(nrow(df)), rownames(table), table)
+    table <- cbind(ROW = seq(nrow(df)),DMU = rownames(table), table)
     names(table) <- c("ROW", "DMU", toupper(names(result$mdea))) 
     return(table)
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
@@ -411,7 +414,7 @@ shinyServer(function(input, output, session) {
     table <- format(table, nsmall = 2)
     
     # renderDataTable does not show row names or numbers, so need to append both
-    table <- cbind(seq(nrow(df)), rownames(table), table)
+    table <- cbind(ROW = seq(nrow(df)),DMU = rownames(table), table)
     names(table) <- c("ROW", "DMU", toupper(names(result$mdea))) 
     return(table)
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
@@ -432,7 +435,7 @@ shinyServer(function(input, output, session) {
     table <- format(table, nsmall = 3)
     
     # renderDataTable does not show row names or numbers, so need to append both
-    table <- cbind(seq(nrow(df)), rownames(table), table) 
+    table <- cbind(ROW = seq(nrow(df)),DMU = rownames(table), table) 
     names(table) <- c("ROW", "DMU", toupper(names(result$tfdea$forecast))) 
     return(table)
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
@@ -773,8 +776,8 @@ shinyServer(function(input, output, session) {
         col.names <- colnames(df[, col.numeric], do.NULL = TRUE)
       
       # Exclude column that is already selected for the introduction date
-      col.names <- col.names[which(col.names != input$intro.date)]
-      
+      col.names <- col.names[which(col.names != input$intro.date)]      
+
       # Include all the remaining columns as input and output options
       col.names.in <- col.names
       col.names.out <- col.names

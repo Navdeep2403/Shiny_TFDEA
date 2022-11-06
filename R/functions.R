@@ -178,9 +178,9 @@ populate.options <- function(df) {
                     col.names, selected = NULL)
 
   # mdea weight restriction
-  updateSelectInput(session, 'mdea.wr_num', 'Weight Restricition (Numerator) Column:',
+  updateSelectInput(session, 'mdea.wr_num', 'Weight Restriction (Numerator) Column:',
                     col.names, selected = NULL)
-  updateSelectInput(session, 'mdea.wr_denom', 'Weight Restricition  (Denominator) Column:',
+  updateSelectInput(session, 'mdea.wr_denom', 'Weight Restriction  (Denominator) Column:',
                     col.names, selected = NULL)
 
 }

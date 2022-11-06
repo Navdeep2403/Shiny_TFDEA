@@ -89,7 +89,7 @@ plot.result <- function(lr, tfdea, dea, mdea) {
     # Create a dataframe with all the data to be plotted
     plot.data <- data.frame(rownames(data.frame(eff)), eff)
     names(plot.data) <- c("dmu", "efficiency")
-    # print("DEA plot print")
+    # print("mDEA plot print")
     # print(plot.data)
     
     p <- plot.data %>% ggvis(~dmu, ~efficiency) %>%
