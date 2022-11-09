@@ -20,6 +20,7 @@ shinyServer(function(input, output, session) {
   hideTab("ts.setup", "ts.setup.tfdea_selection", session)
   hideTab("ts.setup", "ts.setup.dea_selection", session)
   hideTab("ts.setup", "ts.setup.mdea_selection", session)
+  hideTab("ts.setup", "ts.setup.mdea_weights", session)
 
   # hide tabs in the result panel
   hideTab("ts.result", "ts.result.dea", session)
@@ -584,6 +585,7 @@ shinyServer(function(input, output, session) {
         # Change the results tabset to display the plot
         hideTab("ts.setup", "ts.setup.dea_selection", session)
         hideTab("ts.setup", "ts.setup.mdea_selection", session)
+        hideTab("ts.setup", "ts.setup.mdea_weights", session)
         showTab("ts.setup", "ts.setup.tfdea_selection", select = TRUE, session)
         set.model(data.model)
 
@@ -595,6 +597,7 @@ shinyServer(function(input, output, session) {
         # Change the results tabset to display the plot
         hideTab("ts.setup", "ts.setup.tfdea_selection", session)
         hideTab("ts.setup", "ts.setup.mdea_selection", session)
+        hideTab("ts.setup", "ts.setup.mdea_weights", session)
         showTab("ts.setup", "ts.setup.dea_selection", select = TRUE, session)
         set.model(data.model)
 
@@ -602,10 +605,11 @@ shinyServer(function(input, output, session) {
         # updateTabsetPanel(session, "ts.setup", selected = "ts.setup.dea_selection")
       }
       if (data.model == "mdea") {
-        print("Inside MULTIPLIER_DEA")
+        print("Inside MULTIPLIER_DEA next")
         # Change the results tabset to display the plot
         hideTab("ts.setup", "ts.setup.dea_selection", session)
         hideTab("ts.setup", "ts.setup.tfdea_selection", session)
+        hideTab("ts.setup", "ts.setup.mdea_weights", session)
         showTab("ts.setup", "ts.setup.mdea_selection", select = TRUE, session)
         set.model(data.model)
         
@@ -614,6 +618,41 @@ shinyServer(function(input, output, session) {
       }
     }
   }) # observe analysis
+  
+  
+  # Observe the Next button from MDEA column selection 
+  observe({
+    # input$btn.analysis increases by 1 each time the button is pressed
+    if (input$btn.mdeanext != 0){
+      
+      isolate({
+        data.model <- input$model
+        
+        
+        # Find if any error occurred, and if so display
+        error <- get.error()
+        if (!is.null(error))
+          session$sendCustomMessage(type = "show_error", error)
+        
+        # Re-enable buttons
+        elem.disable("btn", FALSE, TRUE)
+      })
+      
+      if (data.model == "mdea") {
+        print("Inside MULTIPLIER_DEA")
+        # Change the results tabset to display the plot
+        hideTab("ts.setup", "ts.setup.dea_selection", session)
+        hideTab("ts.setup", "ts.setup.tfdea_selection", session)
+        showTab("ts.setup", "ts.setup.mdea_selection", select = TRUE, session)
+        showTab("ts.setup", "ts.setup.mdea_weights", select = TRUE, session)
+        set.model(data.model)
+        
+        # populate.options(df)
+        # updateTabsetPanel(session, "ts.setup", selected = "ts.setup.tfdea_selection")
+      }
+    }
+  }) # observe analysis
+  
   
   # Observe the Run Analysis button. When pressed, 
   observe({
