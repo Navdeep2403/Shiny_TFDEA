@@ -20,5 +20,5 @@ This project provides a web interface for a user to perform the Data Envelopment
     5. In the end, Click on the button `Create Project`.
     6. It will clone the git repository and create a new project and open the R console.
 
-4. Open the file `global.R` and click on the `Run App` button on top-right `OR` run the below command in R console:
+4. On the bottom-right, in the `Files` tab, Open the file `global.R` and click on the `Run App` button on top-right `OR` run the below command in R console
 > `shiny::runApp()`
