@@ -6,17 +6,19 @@
 #******************************************************************************
 # Install missing packages
 packages <- c("Rcpp", "dplyr", "shiny", "RCurl", "WriteXLS", "car", "devtools",
-              "ggvis", "Benchmarking", "deaR", "googlesheets4", "MultiplierDEA",
-              "TFDEA")
-if (length(setdiff(packages, installed.packages())) > 0) {
-  # Since TFDEA package is no longer active in CRAN, install it manually,
-  install.packages("TFDEA_0.9.8.3.tar.gz", repos = NULL, type = "source")
+              "ggvis", "Benchmarking", "deaR", "googlesheets4", "MultiplierDEA")
+if (length(setdiff(packages, installed.packages())) > 0)
   install.packages(setdiff(packages, installed.packages()))
-}
 
 # Install required packages not part of cran  
 if (!"shinyIncubator" %in% installed.packages())
   devtools::install_github("rstudio/shiny-incubator")
+
+source_packages <- c("TFDEA")
+if (length(setdiff(source_packages, installed.packages())) > 0) {
+  # Since TFDEA package is no longer active in CRAN, install it manually,
+  install.packages("TFDEA_0.9.8.3.tar.gz", repos = NULL, type = "source")
+}
 
 library(shiny)              # Required for the Shiny application
 library(shinyIncubator)     # Required for additional Shiny options
