@@ -5,9 +5,14 @@
 #
 #******************************************************************************
 # Install missing packages
-packages <- c("Rcpp", "dplyr", "shiny", "RCurl", "TFDEA", "WriteXLS", "car", "devtools", "ggvis")
-if (length(setdiff(packages, installed.packages())) > 0)
+packages <- c("Rcpp", "dplyr", "shiny", "RCurl", "WriteXLS", "car", "devtools",
+              "ggvis", "Benchmarking", "deaR", "googlesheets4", "MultiplierDEA",
+              "TFDEA")
+if (length(setdiff(packages, installed.packages())) > 0) {
+  # Since TFDEA package is no longer active in CRAN, install it manually,
+  install.packages("TFDEA_0.9.8.3.tar.gz", repos = NULL, type = "source")
   install.packages(setdiff(packages, installed.packages()))
+}
 
 # Install required packages not part of cran  
 if (!"shinyIncubator" %in% installed.packages())
