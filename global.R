@@ -5,7 +5,7 @@
 #
 #******************************************************************************
 # Install missing packages
-packages <- c("Rcpp", "dplyr", "shiny", "RCurl", "TFDEA", "WriteXLS", "car", "devtools", "ggvis")
+packages <- c("Rcpp", "dplyr", "shiny", "RCurl", "TFDEA", "WriteXLS", "car", "devtools", "ggvis", "DescTools")
 if (length(setdiff(packages, installed.packages())) > 0)
   install.packages(setdiff(packages, installed.packages()))
 
@@ -24,6 +24,8 @@ library(ggvis)              # Required for plotting results
 library(googlesheets4)      # Required for reading from Google Sheets
 library(deaR)
 library(MultiplierDEA)
+library(rlist)
+library(DescTools)
 # source("R/renderJQPlot.R")  # Required to render Interactive Plots (in server.R)
 # source("R/jqplotOutput.R")  # Required to render Interactive Plots (in ui.R)
 

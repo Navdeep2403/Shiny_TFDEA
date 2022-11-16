@@ -357,8 +357,9 @@ mdea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "outpu
   print(y)
   print(rts)
   print(orientation)
-  print(weightRestriction)
-  mDEA <- DeaMultiplierModel( x, y, rts, orientation, weightRestriction)
+  # print(weightRestriction)
+  # mDEA <- DeaMultiplierModel( x, y, rts, orientation, weightRestriction)
+  mDEA <- DeaMultiplierModel( x, y, rts, orientation)
   
   mDEA.x <- x
   mDEA.y <- y

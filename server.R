@@ -66,6 +66,7 @@ shinyServer(function(input, output, session) {
       downloadButton('btn.down.mdea', 'Download Results')
   })
   
+  
   # Saves TFDEA results to csv file when button pressed
   output$btn.down.tfdea <- downloadHandler(
     filename = function() {
@@ -628,6 +629,42 @@ shinyServer(function(input, output, session) {
       isolate({
         data.model <- input$model
         
+        print(input$mdea.inputs)
+        print(input$mdea.outputs)
+        
+        # output$Dynamic <- renderUI({
+        #   LL <- vector("list",10)       
+        #   for(i in 1:10){
+        #     LL[[i]] <- list(radioButtons(inputId = paste0("mVariable",i), label = paste0("mVariable",i), choices = c("A","B","C")))
+        #   }                              
+        # })
+        
+        
+        output$mdea.pairs <- renderUI({
+          LL = list()
+          
+          # for(i in 1:10){
+          #   LL[i] = list(helpText(paste0("Speed",i)))
+          # }
+          
+          col_list<-append(input$mdea.inputs, input$mdea.outputs)
+          print("col_list")
+          print(col_list)
+          
+          k=1
+          for(x in col_list) {
+            for(y in col_list) {
+              if(x!=y) {
+                LL[k] = list(sliderInput("range", paste(x,y,sep=" - "),
+                                            min = 1, max = 1000,
+                                            value = c(200,500)))
+                k=k+1
+              }
+            }
+          }
+          
+            return(LL)
+        })
         
         # Find if any error occurred, and if so display
         error <- get.error()
@@ -704,13 +741,13 @@ shinyServer(function(input, output, session) {
         
         print("Inside MultiplierDEA Analysis")
 
-        weightRestriction<-data.frame(lower = c(input$mdea.wr_lb), 
-                                      numerator = input$mdea.wr_num,
-                                      denominator = input$mdea.wr_denom,
-                                      upper = c(input$mdea.wr_ub))
+        # weightRestriction<-data.frame(lower = c(input$mdea.wr_lb), 
+        #                               numerator = input$mdea.wr_num,
+        #                               denominator = input$mdea.wr_denom,
+        #                               upper = c(input$mdea.wr_ub))
         
-        print(weightRestriction)
-        mdea <- mdea.analysis(df, input$mdea.inputs, input$mdea.outputs, input$rts, input$orientation, weightRestriction)
+        # print(weightRestriction)
+        mdea <- mdea.analysis(df, input$mdea.inputs, input$mdea.outputs, input$rts, input$orientation)
         print("Inside MultiplierDEA Analysis")
         print(mdea)
         

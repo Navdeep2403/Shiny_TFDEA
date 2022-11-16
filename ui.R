@@ -113,10 +113,11 @@ shinyUI(pageWithSidebar(
                          actionButton("btn.mdeanext","Next")
                 ),
                 tabPanel("MultiplierDEA Weights", value = "ts.setup.mdea_weights",
-                         selectInput('mdea.wr_num', 'Weight Restriction (Numerator):', 'NONE', multiple = TRUE),
-                         selectInput('mdea.wr_denom', 'Weight Restriction (Denominator):', 'NONE', multiple = TRUE),
-                         numericInput('mdea.wr_lb', 'Weight Restriction (Lower Bound):', 1, min = 1, max = 2),
-                         numericInput('mdea.wr_ub', 'Weight Restriction (Upper Bound):', 2, min = 1, max = 2),
+                         uiOutput("mdea.pairs"),
+                         # selectInput('mdea.wr_num', 'Weight Restriction (Numerator):', 'NONE', multiple = TRUE),
+                         # selectInput('mdea.wr_denom', 'Weight Restriction (Denominator):', 'NONE', multiple = TRUE),
+                         # numericInput('mdea.wr_lb', 'Weight Restriction (Lower Bound):', 1, min = 1, max = 2),
+                         # numericInput('mdea.wr_ub', 'Weight Restriction (Upper Bound):', 2, min = 1, max = 2),
                          br(),
                          actionButton("btn.mdeaanalysis","Run MultiplierDEA Analysis")
                 )
