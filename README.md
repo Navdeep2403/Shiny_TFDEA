@@ -10,24 +10,15 @@ This project provides a web interface for a user to perform the Data Envelopment
 2. Download and install R Studio: https://download1.rstudio.org/desktop/windows/RStudio-2022.07.2-576.exe \
 (More Details at https://posit.co/download/rstudio-desktop/)
 
-3. Open RStudio and open this TFDEA project:
-> File > Open Project > "Path to Repo" > Shiny_TFDEA.Rproj
+3. Open RStudio, open TFDEA project using instructions below:
+    1. From the menu options on the top bar, choose `File > New project`.
+    2. From the New project wizard, choose `Version Control (Checkout a project from a version control repository)`.
+    3. From the next options, choose `Git (Clone a project from a Git repository)`.
+    4. On the next window, fill the details as below:
+        1. In `Repository URL`, enter this repository link - https://github.com/Navdeep2403/Shiny_TFDEA
+        2. In `Project directory name` - change the directory name if you like. (optional).
+    5. In the end, Click on the button `Create Project`.
+    6. It will clone the git repository and create a new project and open the R console.
 
-4. Install packages by running this command in the R Console:
-> `install.packages(c("Benchmarking", "car", "deaR", "googlesheets4", "MultiplierDEA"))`
-
-( Multiple other dependent packages will be installed automatically. if not, please refer to the list in the Extra details section)
-
-5. Install TFDEA package from the repo manually:
-> `install.packages("TFDEA_0.9.8.3.tar.gz", repos = NULL, type = "source")`
-
-(source: https://cran.r-project.org/src/contrib/Archive/TFDEA/TFDEA_0.9.8.3.tar.gz)
-
-6. Run the application:
+4. On the bottom-right, in the `Files` tab, Open the file `global.R` and click on the `Run App` button on top-right `OR` run the below command in R console
 > `shiny::runApp()`
-
-
-### Extra details:
-These dependent packages are installed automatically. In case of any issues with automatic installation, please run this command to install them manually:
-
-> `install.packages(c("rprojroot", "crayon", "fs", "diffobj", "rematch2", "sys", "stringi", "brio", "callr", "desc", "pkgload", "praise", "processx", "ps", "waldo", "askpass", "backports", "stringr", "evaluate", "highr", "yaml", "xfun", "testthat", "colorspace", "fansi", "curl", "mime", "openssl", "fastmap", "later", "utf8", "broom", "magrittr", "numDeriv", "knitr", "SparseM", "MatrixModels", "minqa", "nloptr", "RcppEigen", "farver", "labeling", "lifecycle", "munsell", "R6", "RColorBrewer", "rlang", "viridisLite", "cli", "glue", "gtable", "isoband", "tibble", "vctrs", "withr", "ellipsis", "purrr", "tidyselect", "cpp11", "httr", "jsonlite", "digest", "base64enc", "htmltools", "htmlwidgets", "lazyeval", "crosstalk", "data.table", "promises", "pkgconfig", "generics", "pillar", "lpSolveAPI", "ucminf", "quadprog", "Rcpp", "carData", "abind", "pbkrtest", "quantreg", "lme4", "scales", "lpSolve", "ggplot2", "tidyr", "plotly", "igraph", "writexl", "dplyr", "gridExtra", "rematch", "uuid", "cellranger", "gargle", "googledrive", "ids", "registry", "slam", "Rglpk", "listcomp", "ROI", "ROI.plugin.glpk", "ompr", "ompr.roi", "credentials", "zip", "gitcreds", "ini", "systemfonts", "textshaping", "tinytex", "clipr", "gert", "gh", "rstudioapi", "whisker", "prettyunits", "downlit", "ragg", "rmarkdown", "xml2", "xopen", "brew", "bitops", "usethis", "miniUI", "pkgbuild", "pkgdown", "profvis", "rcmdcheck", "remotes", "roxygen2", "rversions", "sessioninfo", "urlchecker", "assertthat"))`
