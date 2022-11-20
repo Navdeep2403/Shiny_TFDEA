@@ -32,8 +32,6 @@ library(ggvis)              # Required for plotting results
 library(googlesheets4)      # Required for reading from Google Sheets
 library(deaR)
 library(MultiplierDEA)
-library(rlist)
-library(DescTools)
 # source("R/renderJQPlot.R")  # Required to render Interactive Plots (in server.R)
 # source("R/jqplotOutput.R")  # Required to render Interactive Plots (in ui.R)
 
