@@ -309,7 +309,7 @@ dea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "output
 # df                          -> uploaded data
 # inputs/outputs              -> TFDEA inputs and outputs
 # rts/orientation             -> returns to scale and orientation of TFDEA model
-mdea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "output", weightRestriction) {
+mdea.analysis <- function(session, df, inputs, outputs, rts = "vrs", orientation = "output", weightRestriction) {
   
   print("Inside mdea.analysis")
   # Check parameter values
@@ -326,6 +326,58 @@ mdea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "outpu
     return(NULL) 
   }
 
+  # browser()
+  print(input$mdea.inputs)
+  print(df[input$mdea.inputs])
+  
+  for (col in input$mdea.inputs) {
+    print(as.list(df[col]))
+    for (val in as.list(df[col])){
+      print(val)
+      if (0 %in% val) {
+        # set.error(paste("Input Column: ", col, " contains one or more values that are 0. This is invalid for Weight Restriction"))
+        # return(NULL)
+        # browser()
+        # Find if any error occurred, and if so display
+        shinyalert(paste("Application reloading soon... ERROR:", "In column", col, "data has DMU's with values that are zero, th is may cause numerical
+      problems"),
+                   type="error",
+                   session = session,
+                   showConfirmButton = FALSE,
+                   callbackR = function(x) {session$reload();},
+                   callbackJS = function(x) {location.reload();})
+        Sys.sleep(3)
+        session$reload();
+
+      }  
+    }
+  }
+
+  print(input$mdea.outputs)
+  print(df[input$mdea.outputs])
+  
+  for (col in input$mdea.outputs) {
+    print(as.list(df[col]))
+    for (val in as.list(df[col])){
+      print(val)
+      if (0 %in% val) {
+        # set.error(paste("Input Column: ", col, " contains one or more values that are 0. This is invalid for Weight Restriction"))
+        # return(NULL)
+        # browser()
+        # Find if any error occurred, and if so display
+        shinyalert(paste("Application reloading soon... ERROR:", "In column", col, "data has DMU's with values that are zero, th is may cause numerical
+      problems"),
+                   type="error",
+                   session = session,
+                   showConfirmButton = FALSE,
+                   callbackR = function(x) {session$reload();},
+                   callbackJS = function(x) {location.reload();})
+        Sys.sleep(3)
+        session$reload();
+        
+      }  
+    }
+  }
   
   dmu.count <- nrow(df)
   dmu.names <- row.names(df)
@@ -345,6 +397,9 @@ mdea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "outpu
   else                            
     y <- df[outputs]
   
+  
+  
+  
   # Assign names to inputs and outputs
   # colnames(x) <- toupper(paste('x', colnames(x), sep='_'))
   # colnames(y) <- toupper(paste('y', colnames(y), sep='_'))
@@ -358,8 +413,8 @@ mdea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "outpu
   print(rts)
   print(orientation)
   # print(weightRestriction)
-  # mDEA <- DeaMultiplierModel( x, y, rts, orientation, weightRestriction)
-  mDEA <- DeaMultiplierModel( x, y, rts, orientation)
+  mDEA <- DeaMultiplierModel( x, y, rts, orientation, weightRestriction)
+  # mDEA <- DeaMultiplierModel( x, y, rts, orientation)
   
   mDEA.x <- x
   mDEA.y <- y

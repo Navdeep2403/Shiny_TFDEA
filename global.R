@@ -5,7 +5,7 @@
 #
 #******************************************************************************
 # Install missing packages
-packages <- c("Rcpp", "dplyr", "shiny", "RCurl", "WriteXLS", "car", "devtools",
+packages <- c("shinyalert", "Rcpp", "dplyr", "shiny", "RCurl", "WriteXLS", "car", "devtools",
               "ggvis", "Benchmarking", "deaR", "googlesheets4", "MultiplierDEA")
 
 if (length(setdiff(packages, installed.packages())) > 0)
@@ -21,7 +21,8 @@ if (length(setdiff(source_packages, installed.packages())) > 0) {
   install.packages("TFDEA_0.9.8.3.tar.gz", repos = NULL, type = "source")
 }
 
-library(shiny)              # Required for the Shiny application
+library(shiny)      
+library(shinyalert) # Required for the Shiny application
 library(shinyIncubator)     # Required for additional Shiny options
 library(RCurl)              # Required for obtaining data from Google spreadsheets 
 library(TFDEA)              # Required for TFDEA analysis

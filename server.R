@@ -28,6 +28,8 @@ shinyServer(function(input, output, session) {
   hideTab("ts.result", "ts.result.mdea", session)
   hideTab("ts.result", "ts.result.lr", session)
   
+  mdea_cols_list = list()
+  
   output$frontier.date <- renderUI({
 
     # Get data and the current intro date
@@ -629,41 +631,38 @@ shinyServer(function(input, output, session) {
       isolate({
         data.model <- input$model
         
-        print(input$mdea.inputs)
-        print(input$mdea.outputs)
-        
-        # output$Dynamic <- renderUI({
-        #   LL <- vector("list",10)       
-        #   for(i in 1:10){
-        #     LL[[i]] <- list(radioButtons(inputId = paste0("mVariable",i), label = paste0("mVariable",i), choices = c("A","B","C")))
-        #   }                              
-        # })
-        
-        
         output$mdea.pairs <- renderUI({
-          LL = list()
+          slider_list = list()
           
-          # for(i in 1:10){
-          #   LL[i] = list(helpText(paste0("Speed",i)))
-          # }
-          
-          col_list<-append(input$mdea.inputs, input$mdea.outputs)
-          print("col_list")
-          print(col_list)
-          
+          columns_list<-append(input$mdea.inputs, input$mdea.outputs)
+
           k=1
-          for(x in col_list) {
-            for(y in col_list) {
+          for(x in columns_list) {
+            for(y in columns_list) {
               if(x!=y) {
-                LL[k] = list(sliderInput("range", paste(x,y,sep=" - "),
-                                            min = 1, max = 1000,
-                                            value = c(200,500)))
+
+                slider_list[k] = list(
+                  sliderInput(
+                    paste("mdea_weights", paste(x,y,sep="_"), sep = "."), # InputID mdea.weights.column1_column2
+                    paste(x,y,sep=" - "), # Input label on UI
+                    min = 1,
+                    max = 1000,
+                    value = c(200,500)
+                    )
+                  )
+                
+                # saving  InputID into a list for later access
+                mdea_cols_list[k] <<- paste("mdea_weights", paste(x,y,sep="_"), sep = ".")
+                
                 k=k+1
               }
             }
           }
           
-            return(LL)
+          print("mdea_cols_list")
+          print(mdea_cols_list)
+          
+          return(slider_list)
         })
         
         # Find if any error occurred, and if so display
@@ -728,7 +727,7 @@ shinyServer(function(input, output, session) {
       hideTab("ts.result", "ts.result.tfdea", session)
       hideTab("ts.result", "ts.result.mdea", session)
       showTab("ts.result", "ts.result.dea", select = FALSE, session)
-      updateTabsetPanel(session, "ts.result", selected = "ts.result.dea")
+      updateTabsetPanel(session, "ts.result", selected = "ts.result.plot")
     }
     
     # check the model if mDEA and run mDEA Analysis and
@@ -741,16 +740,49 @@ shinyServer(function(input, output, session) {
         
         print("Inside MultiplierDEA Analysis")
 
-        # weightRestriction<-data.frame(lower = c(input$mdea.wr_lb), 
-        #                               numerator = input$mdea.wr_num,
-        #                               denominator = input$mdea.wr_denom,
-        #                               upper = c(input$mdea.wr_ub))
+      
+        print("DEBUG: printing MDEA_WEIGHTS.COL1_COL2")
+        print(mdea_cols_list)
         
+        numerators <- c()
+        denominators <- c()
+        lower_bound <- c()
+        upper_bound <- c()
+        
+        for (item in mdea_cols_list) {
+
+          split_item = strsplit(item,".", fixed = TRUE)
+          split_cols = strsplit(split_item[[1]][2], "_")
+          
+          print(paste("Adding numerator", split_cols[[1]][1]))
+          numerators <- c(numerators, split_cols[[1]][1])
+          
+          print(paste("Adding denominator", split_cols[[1]][2]))
+          denominators <- c(denominators, split_cols[[1]][2])
+
+          print(paste("Lower bound:", input[[item]][1]))
+          lower_bound <- c(lower_bound, input[[item]][1])
+          
+          print(paste("Upper bound:", input[[item]][2]))
+          upper_bound <- c(upper_bound, input[[item]][2])
+        }
+        
+        print("Final Weight Restrcition: ")
+        print(numerators)
+        print(denominators)
+        print(lower_bound)
+        print(upper_bound)
+        
+        weightRestriction<-data.frame(lower = lower_bound,
+                                      numerator = numerators,
+                                      denominator = denominators,
+                                      upper = upper_bound)
+
         # print(weightRestriction)
-        mdea <- mdea.analysis(df, input$mdea.inputs, input$mdea.outputs, input$rts, input$orientation)
-        print("Inside MultiplierDEA Analysis")
-        print(mdea)
-        
+        mdea <- mdea.analysis(session, df, input$mdea.inputs, input$mdea.outputs, input$rts, input$orientation, weightRestriction)
+        # print("Inside MultiplierDEA Analysis")
+        # print(mdea)
+
         set.result.mdea(mdea)
         set.result.dea(list())
         set.result.tfdea(list())
@@ -764,6 +796,8 @@ shinyServer(function(input, output, session) {
       if (!is.null(error))
         session$sendCustomMessage(type = "show_error", error)
       
+      
+      
       # Re-enable buttons
       elem.disable("btn", FALSE, TRUE)
       
@@ -772,7 +806,7 @@ shinyServer(function(input, output, session) {
       hideTab("ts.result", "ts.result.tfdea", session)
       hideTab("ts.result", "ts.result.dea", session)
       showTab("ts.result", "ts.result.mdea", select = FALSE, session)
-      updateTabsetPanel(session, "ts.result", selected = "ts.result.mdea")
+      updateTabsetPanel(session, "ts.result", selected = "ts.result.plot")
     }
     
     # check the model if TFDEA and run TFDEA and linear regression analysis and
