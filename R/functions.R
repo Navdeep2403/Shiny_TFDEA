@@ -154,17 +154,14 @@ populate.options <- function(df) {
     return()
   }
   
-  print("Uniq")
-  print(col.names)
-  
   # Update selectInputs with names of numeric columns, with the addition of constant_1
   col.names <- c("Constant_1", col.names)
   #tfdea
-  updateSelectInput(session, 'tfdea.inputs', 'Select Input(s):', 
+  updateSelectInput(session, 'tfdea.inputs', 'Select Input(s):',
                     col.names, selected = NULL)
-  updateSelectInput(session, 'tfdea.outputs', 'Select Output(s):', 
+  updateSelectInput(session, 'tfdea.outputs', 'Select Output(s):',
                     col.names, selected = NULL)
-  updateSelectInput(session, 'intro.date', 'Select Year of Introduction:', 
+  updateSelectInput(session, 'intro.date', 'Select Year of Introduction:',
                     col.names[-1])
   #dea
   updateSelectInput(session, 'dea.inputs', 'Select Input:', 
@@ -309,7 +306,7 @@ dea.analysis <- function(df, inputs, outputs, rts = "vrs", orientation = "output
 # df                          -> uploaded data
 # inputs/outputs              -> TFDEA inputs and outputs
 # rts/orientation             -> returns to scale and orientation of TFDEA model
-mdea.analysis <- function(session, df, inputs, outputs, rts = "vrs", orientation = "output", weightRestriction) {
+mdea.analysis <- function(session, df, inputs, outputs, rts = "vrs", orientation = "output", weightRestriction = NULL) {
   
   print("Inside mdea.analysis")
   # Check parameter values
@@ -327,58 +324,6 @@ mdea.analysis <- function(session, df, inputs, outputs, rts = "vrs", orientation
   }
 
   # browser()
-  print(input$mdea.inputs)
-  print(df[input$mdea.inputs])
-  
-  for (col in input$mdea.inputs) {
-    print(as.list(df[col]))
-    for (val in as.list(df[col])){
-      print(val)
-      if (0 %in% val) {
-        # set.error(paste("Input Column: ", col, " contains one or more values that are 0. This is invalid for Weight Restriction"))
-        # return(NULL)
-        # browser()
-        # Find if any error occurred, and if so display
-        shinyalert(paste("Application reloading soon... ERROR:", "In column", col, "data has DMU's with values that are zero, th is may cause numerical
-      problems"),
-                   type="error",
-                   session = session,
-                   showConfirmButton = FALSE,
-                   callbackR = function(x) {session$reload();},
-                   callbackJS = function(x) {location.reload();})
-        Sys.sleep(3)
-        session$reload();
-
-      }  
-    }
-  }
-
-  print(input$mdea.outputs)
-  print(df[input$mdea.outputs])
-  
-  for (col in input$mdea.outputs) {
-    print(as.list(df[col]))
-    for (val in as.list(df[col])){
-      print(val)
-      if (0 %in% val) {
-        # set.error(paste("Input Column: ", col, " contains one or more values that are 0. This is invalid for Weight Restriction"))
-        # return(NULL)
-        # browser()
-        # Find if any error occurred, and if so display
-        shinyalert(paste("Application reloading soon... ERROR:", "In column", col, "data has DMU's with values that are zero, th is may cause numerical
-      problems"),
-                   type="error",
-                   session = session,
-                   showConfirmButton = FALSE,
-                   callbackR = function(x) {session$reload();},
-                   callbackJS = function(x) {location.reload();})
-        Sys.sleep(3)
-        session$reload();
-        
-      }  
-    }
-  }
-  
   dmu.count <- nrow(df)
   dmu.names <- row.names(df)
   # Create vector of all 1's for constant
@@ -413,9 +358,14 @@ mdea.analysis <- function(session, df, inputs, outputs, rts = "vrs", orientation
   print(rts)
   print(orientation)
   # print(weightRestriction)
-  mDEA <- DeaMultiplierModel( x, y, rts, orientation, weightRestriction)
-  # mDEA <- DeaMultiplierModel( x, y, rts, orientation)
   
+  if (is.null(weightRestriction)) {
+    mDEA <- DeaMultiplierModel( x, y, rts, orientation)
+  } 
+  else {
+    mDEA <- DeaMultiplierModel( x, y, rts, orientation, weightRestriction)
+  }
+
   mDEA.x <- x
   mDEA.y <- y
   mDEA.rts <- rts
