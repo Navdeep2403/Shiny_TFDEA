@@ -28,7 +28,8 @@ shinyServer(function(input, output, session) {
   hideTab("ts.result", "ts.result.mdea", session)
   hideTab("ts.result", "ts.result.lr", session)
   
-  mdea_cols_list = list()
+  mdea_cols_list_input = list()
+  mdea_cols_list_output = list()
   
   output$frontier.date <- renderUI({
 
@@ -629,51 +630,205 @@ shinyServer(function(input, output, session) {
     if (input$btn.mdeanext != 0){
       
       isolate({
+        
+        df <- get.df()
         data.model <- input$model
         
-        output$mdea.pairs <- renderUI({
-          slider_list = list()
-          
-          columns_list<-append(input$mdea.inputs, input$mdea.outputs)
+        # Extracting columns with non-zero values
+        columns_list_in<-c()
 
-          k=1
-          for(x in columns_list) {
-            for(y in columns_list) {
-              if(x!=y) {
+        for (x in input$mdea.inputs) {
+          if(!(0 %in% df[[x]])) {
+            columns_list_in <- c(columns_list_in, x)
+          }
+        }
+        
+        print("columns_list_in")
+        print(columns_list_in)
+        
+        if (length(columns_list_in) > 1) {
 
-                slider_list[k] = list(
-                  sliderInput(
-                    paste("mdea_weights", paste(x,y,sep="_"), sep = "."), # InputID mdea.weights.column1_column2
-                    paste(x,y,sep=" - "), # Input label on UI
-                    min = 1,
-                    max = 1000,
-                    value = c(200,500)
-                    )
-                  )
-                
-                # saving  InputID into a list for later access
-                mdea_cols_list[k] <<- paste("mdea_weights", paste(x,y,sep="_"), sep = ".")
-                
-                k=k+1
+          output$mdea.pairs.input <- renderUI({
+            slider_list = list()
+            
+            # columns_list<-input$mdea.inputs
+            
+            # min_lb = 0
+            # max_ub = 10000
+            # default_lb = 2000
+            # default_ub = 5000
+
+            k=1
+            for(x in columns_list_in) {
+              for(y in columns_list_in) {
+                if(x!=y) {
+                  print("x")
+                  print(x)
+                  
+                  print("y")
+                  print(y)
+
+                  min_lb = round(min(df[x])/max(df[y]) + 1, digits=2)
+                  max_ub = round(max(df[x])/min(df[y]) + 1, digits=2)
+
+                  default_lb = (min_lb + max_ub )/3
+                  default_ub = default_lb * 2
+  
+                  slider_list[k] = list(
+                    sliderInput(
+                      paste("mdea_weights", paste(x,y,sep="_"), sep = "__"), #InputID mdea_weights.column1_column2
+                      paste(x,y,sep=" - "), # Input label on UI
+                      min = min_lb,
+                      max = max_ub,
+                      value = c(default_lb,default_ub)
+                      ))
+  
+                  # slider_list[k+1] = list(
+                  #   textInput(
+                  #     inputId = paste("lower_mdea_weights", paste(x,y,sep="_"), sep = "__"),
+                  #     value = default_lb,
+                  #     label=NULL,
+                  #     placeholder = "Lower bound"
+                  #     ))
+                  # 
+                  # slider_list[k+2] = list(
+                  #   textInput(
+                  #     inputId = paste("upper_mdea_weights", paste(x,y,sep="_"), sep = "__"),
+                  #     value = default_ub,
+                  #     label=NULL,
+                  #     placeholder = "Upper bound"
+                  #     ))
+  
+                  # saving  InputID into a list for later access
+                  mdea_cols_list_input <<- append(mdea_cols_list_input, paste("mdea_weights", paste(x,y,sep="_"), sep = "__"))
+  
+                  # k=k+3
+                  k =k+1
+                }
               }
             }
-          }
-          
-          print("mdea_cols_list")
-          print(mdea_cols_list)
-          
-          return(slider_list)
-        })
+  
+            print("mdea_cols_list_input")
+            print(mdea_cols_list_input)
+  
+            return(slider_list)
+          })
+        }
+        else {
+          output$mdea.pairs.input <- renderText({ 
+            "In order to user Weight Distrbution, please choose atleast 2 'Non-Zero' Input columns, Otherwise Please ignore and Run the Analysis."
+          })
+        }
         
+        
+        
+        
+        # Extracting columns with non-zero values
+        columns_list_out<-c()
+        
+        for (x in input$mdea.outputs) {
+          if(!(0 %in% df[[x]])) {
+            columns_list_out <- c(columns_list_out, x)
+          }
+        }
+        
+        if (length(columns_list_out) > 1) {
+          
+            output$mdea.pairs.output <- renderUI({
+              slider_list = list()
+              
+              # columns_list<-input$mdea.outputs
+              
+              # min_lb = 0
+              # max_ub = 10000
+              # default_lb = 2000
+              # default_ub = 5000
+              
+              k=1
+              for(x in columns_list_out) {
+                for(y in columns_list_out) {
+                  if(x!=y) {
+                    
+                    min_lb = round(min(df[x])/max(df[y]) + 1, digits=2)
+                    max_ub = round(max(df[x])/min(df[y]) + 1, digits=2)
+                    
+                    default_lb = (min_lb + max_ub)/3   # 1/3rd of the slider
+                    default_ub = default_lb * 2        # 2/3rd of the slider
+                    
+                    slider_list[k] = list(
+                      sliderInput(
+                        paste("mdea_weights", paste(x,y,sep="_"), sep = "__"), #InputID mdea_weights.column1_column2
+                        paste(x,y,sep=" - "), # Input label on UI
+                        min = min_lb,
+                        max = max_ub,
+                        value = c(default_lb,default_ub)
+                      ))
+                    
+                    # slider_list[k+1] = list(
+                    #   textInput(
+                    #     inputId = paste("lower_mdea_weights", paste(x,y,sep="_"), sep = "__"),
+                    #     value = default_lb,
+                    #     label=NULL,
+                    #     placeholder = "Lower bound"
+                    #   ))
+                    # 
+                    # slider_list[k+2] = list(
+                    #   textInput(
+                    #     inputId = paste("upper_mdea_weights", paste(x,y,sep="_"), sep = "__"),
+                    #     value = default_ub,
+                    #     label=NULL,
+                    #     placeholder = "Upper bound"
+                    #   ))
+                    
+                    # saving  InputID into a list for later access
+                    # mdea_cols_list_output <<- paste("mdea_weights", paste(x,y,sep="_"), sep = "__")
+                    mdea_cols_list_output <<- append(mdea_cols_list_output, paste("mdea_weights", paste(x,y,sep="_"), sep = "__"))
+                    
+                    # k=k+3
+                    k=k+1
+                  }
+                }
+              }
+              
+              print("mdea_cols_list_output")
+              print(mdea_cols_list_output)
+              
+              return(slider_list)
+            })
+        } else {
+          output$mdea.pairs.output <- renderText({ 
+            "In order to user Weight Distrbution, please choose atleast 2 'Non-Zero' Output columns, Otherwise Please ignore and Run the Analysis."
+          })
+        }
+        
+        # for (item in mdea_cols_list) {
+        #   observeEvent(input[[item]], {
+        #     print("Inside loop: observeEvent: mdea")
+        #     
+        #     lb_item = paste0("lower_",item)
+        #     ub_item = paste0("upper_",item)
+        #     
+        #     if(input[[item]][1] != as.numeric(input[[lb_item]]) &&
+        #        input[[item]][2] != as.numeric(input[[ub_item]]))
+        #     {
+        #       updateSliderInput(
+        #         session = session,
+        #         inputId = item,
+        #         value = c(input[[lb_item]], input[[ub_item]])
+        #       )
+        #     }
+        #   })
+        # }
+
         # Find if any error occurred, and if so display
         error <- get.error()
         if (!is.null(error))
           session$sendCustomMessage(type = "show_error", error)
-        
+
         # Re-enable buttons
         elem.disable("btn", FALSE, TRUE)
       })
-      
+
       if (data.model == "mdea") {
         print("Inside MULTIPLIER_DEA")
         # Change the results tabset to display the plot
@@ -682,14 +837,14 @@ shinyServer(function(input, output, session) {
         showTab("ts.setup", "ts.setup.mdea_selection", select = TRUE, session)
         showTab("ts.setup", "ts.setup.mdea_weights", select = TRUE, session)
         set.model(data.model)
-        
+
         # populate.options(df)
         # updateTabsetPanel(session, "ts.setup", selected = "ts.setup.tfdea_selection")
       }
     }
   }) # observe analysis
-  
-  
+
+
   # Observe the Run Analysis button. When pressed, 
   observe({
     # input$btn.analysis increases by 1 each time the button is pressed
@@ -730,6 +885,7 @@ shinyServer(function(input, output, session) {
       updateTabsetPanel(session, "ts.result", selected = "ts.result.plot")
     }
     
+    
     # check the model if mDEA and run mDEA Analysis and
     # display the results in the appropriate tables
     if (input$btn.mdeaanalysis != 0 && get.model() == "mdea"){
@@ -739,47 +895,58 @@ shinyServer(function(input, output, session) {
         df <- get.df()
         
         print("Inside MultiplierDEA Analysis")
-
-      
-        print("DEBUG: printing MDEA_WEIGHTS.COL1_COL2")
-        print(mdea_cols_list)
         
-        numerators <- c()
-        denominators <- c()
-        lower_bound <- c()
-        upper_bound <- c()
-        
-        for (item in mdea_cols_list) {
+        if (length(mdea_cols_list_input) > 1 && length(mdea_cols_list_output) > 1 ) {
 
-          split_item = strsplit(item,".", fixed = TRUE)
-          split_cols = strsplit(split_item[[1]][2], "_")
-          
-          print(paste("Adding numerator", split_cols[[1]][1]))
-          numerators <- c(numerators, split_cols[[1]][1])
-          
-          print(paste("Adding denominator", split_cols[[1]][2]))
-          denominators <- c(denominators, split_cols[[1]][2])
-
-          print(paste("Lower bound:", input[[item]][1]))
-          lower_bound <- c(lower_bound, input[[item]][1])
-          
-          print(paste("Upper bound:", input[[item]][2]))
-          upper_bound <- c(upper_bound, input[[item]][2])
+            mdea_cols_list<-append(mdea_cols_list_input, mdea_cols_list_output)
+            
+            print("DEBUG: printing MDEA_WEIGHTS.COL1_COL2")
+            print(mdea_cols_list)
+            
+            numerators <- c()
+            denominators <- c()
+            lower_bound <- c()
+            upper_bound <- c()
+            
+            for (item in mdea_cols_list) {
+              
+              print(item)
+    
+              split_item = strsplit(item,"__", fixed = TRUE)
+              split_cols = strsplit(split_item[[1]][2], "_")
+              
+              print(paste("Adding numerator", split_cols[[1]][1]))
+              numerators <- c(numerators, split_cols[[1]][1])
+              
+              print(paste("Adding denominator", split_cols[[1]][2]))
+              denominators <- c(denominators, split_cols[[1]][2])
+    
+              print(paste("Lower bound:", input[[item]][1]))
+              lower_bound <- c(lower_bound, input[[item]][1])
+              
+              print(paste("Upper bound:", input[[item]][2]))
+              upper_bound <- c(upper_bound, input[[item]][2])
+            }
+            
+            print("Final Weight Restrcition: ")
+            print(numerators)
+            print(denominators)
+            print(lower_bound)
+            print(upper_bound)
+            
+            weightRestriction<-data.frame(lower = lower_bound,
+                                          numerator = numerators,
+                                          denominator = denominators,
+                                          upper = upper_bound)
+    
+            # print(weightRestriction)
+            mdea <- mdea.analysis(session, df, input$mdea.inputs, input$mdea.outputs, input$rts, input$orientation, weightRestriction)
         }
-        
-        print("Final Weight Restrcition: ")
-        print(numerators)
-        print(denominators)
-        print(lower_bound)
-        print(upper_bound)
-        
-        weightRestriction<-data.frame(lower = lower_bound,
-                                      numerator = numerators,
-                                      denominator = denominators,
-                                      upper = upper_bound)
+        else {
 
-        # print(weightRestriction)
-        mdea <- mdea.analysis(session, df, input$mdea.inputs, input$mdea.outputs, input$rts, input$orientation, weightRestriction)
+            mdea <- mdea.analysis(session, df, input$mdea.inputs, input$mdea.outputs, input$rts, input$orientation)
+          
+        }
         # print("Inside MultiplierDEA Analysis")
         # print(mdea)
 
@@ -904,10 +1071,15 @@ shinyServer(function(input, output, session) {
       
       # If the orientation is output, only allow Constant_1 as an input selection,
       # and vice-versa
-      # if (input$orientation == "out")
-      #   col.names.in <- c("Constant_1", col.names)
-      # if (input$orientation == "in")
-      #   col.names.out <- c("Constant_1", col.names)
+      if (input$orientation == "out" || input$dea.orientation == "out" 
+          || input$mdea.orientation == "out") {
+        col.names.in <- c("Constant_1", col.names)
+      }
+      
+      if (input$orientation == "in" || input$dea.orientation == "in" 
+          || input$mdea.orientation == "in") {
+        col.names.out <- c("Constant_1", col.names)
+      }
       
       # Update the options for inputs and outputs for TFDEA
       updateSelectInput(session, 'tfdea.inputs', 'Select Input(s):', 
@@ -938,5 +1110,204 @@ shinyServer(function(input, output, session) {
     }
 
   }) # observe intro.date
+  
+
+  ## Update TFDEA input and Output Select Inputs based on selection in each other
+    
+  observeEvent(input$tfdea.inputs, {
+
+    # Get uploaded data saved in the global server df dataframe
+    df <- get.df()
+
+    # Determine the names of the columns that are numeric
+    col.numeric <- sapply(df, is.numeric)
+
+    col.names <- "NONE"
+    if (sum(col.numeric) != 0)
+      col.names <- colnames(df[, col.numeric], do.NULL = TRUE)
+
+    cols.out <- c()
+
+    for (col in col.names) {
+      if (!(col %in% input$tfdea.inputs)) {
+        cols.out <- c(col, cols.out)
+      }
+    }
+
+    if (input$orientation == "in" || input$dea.orientation == "in"
+        || input$mdea.orientation == "in") {
+      cols.out <- c("Constant_1", cols.out)
+    }
+
+    updateSelectInput(session, 'tfdea.outputs', 'Select Output(s):',
+                      cols.out, input$tfdea.outputs)
+
+  })
+
+
+  observeEvent(input$tfdea.outputs, {
+
+    # Get uploaded data saved in the global server df dataframe
+    df <- get.df()
+
+    # Determine the names of the columns that are numeric
+    col.numeric <- sapply(df, is.numeric)
+
+    col.names <- "NONE"
+    if (sum(col.numeric) != 0)
+      col.names <- colnames(df[, col.numeric], do.NULL = TRUE)
+
+    cols.in <- c()
+
+    for (col in col.names) {
+      if (!(col %in% input$tfdea.outputs)) {
+        cols.in <- c(col, cols.in)
+      }
+    }
+
+    if (input$orientation == "out" || input$dea.orientation == "out"
+        || input$mdea.orientation == "out") {
+      cols.in <- c("Constant_1", cols.in)
+    }
+
+    updateSelectInput(session, 'tfdea.inputs', 'Select Input(s):',
+                      cols.in, input$tfdea.inputs)
+
+  })
+
+  
+  ## Update DEA input and Output Select Inputs based on selection in each other
+  observeEvent(input$dea.inputs, {
+
+    
+    # Get uploaded data saved in the global server df dataframe
+    df <- get.df()
+    
+    if(nrow(df) != 0) {
+      # Determine the names of the columns that are numeric
+      col.numeric <- sapply(df, is.numeric)
+      print("col.numeric")
+      print(col.numeric)
+    
+      col.names <- "NONE"
+      if (sum(col.numeric) != 0)
+        col.names <- colnames(df[, col.numeric], do.NULL = TRUE)
+    
+      cols.out <- c()
+    
+      for (col in col.names) {
+        if (!(col == input$dea.inputs)) {
+          cols.out <- c(col, cols.out)
+        }
+      }
+    
+      if (input$orientation == "in" || input$dea.orientation == "in"
+          || input$mdea.orientation == "in") {
+        cols.out <- c("Constant_1", cols.out)
+      }
+    
+      updateSelectInput(session, 'dea.outputs', 'Select Output(s):',
+                        cols.out, input$dea.outputs)
+    }
+
+  })
+
+
+  observeEvent(input$dea.outputs, {
+
+    # Get uploaded data saved in the global server df dataframe
+    df <- get.df()
+    
+    if(nrow(df) != 0) {
+
+      # Determine the names of the columns that are numeric
+      col.numeric <- sapply(df, is.numeric)
+  
+      col.names <- "NONE"
+      if (sum(col.numeric) != 0)
+        col.names <- colnames(df[, col.numeric], do.NULL = TRUE)
+  
+      cols.in <- c()
+  
+      for (col in col.names) {
+        if (!(col == input$dea.outputs)) {
+          cols.in <- c(col, cols.in)
+        }
+      }
+  
+      if (input$orientation == "out" || input$dea.orientation == "out"
+          || input$mdea.orientation == "out") {
+        cols.in <- c("Constant_1", cols.in)
+      }
+  
+      updateSelectInput(session, 'dea.inputs', 'Select Input(s):',
+                        cols.in, input$dea.inputs)
+    }
+
+  })
+
+
+  ## Update MDEA input and Output Select Inputs based on selection in each other
+  
+  observeEvent(input$mdea.inputs, {
+    
+    # Get uploaded data saved in the global server df dataframe
+    df <- get.df()
+    
+    # Determine the names of the columns that are numeric
+    col.numeric <- sapply(df, is.numeric)
+    
+    col.names <- "NONE"
+    if (sum(col.numeric) != 0)                 
+      col.names <- colnames(df[, col.numeric], do.NULL = TRUE)
+    
+    cols.out <- c()
+    
+    for (col in col.names) {
+      if (!(col %in% input$mdea.inputs)) {
+        cols.out <- c(col, cols.out)
+      }
+    }
+    
+    if (input$orientation == "in" || input$dea.orientation == "in" 
+        || input$mdea.orientation == "in") {
+      cols.out <- c("Constant_1", cols.out)
+    }
+    
+    updateSelectInput(session, 'mdea.outputs', 'Select Output(s):', 
+                      cols.out, input$mdea.outputs)
+    
+  })
+  
+  
+  observeEvent(input$mdea.outputs, {
+    
+    # Get uploaded data saved in the global server df dataframe
+    df <- get.df()
+    
+    # Determine the names of the columns that are numeric
+    col.numeric <- sapply(df, is.numeric)
+    
+    col.names <- "NONE"
+    if (sum(col.numeric) != 0)                 
+      col.names <- colnames(df[, col.numeric], do.NULL = TRUE)
+    
+    cols.in <- c()
+    
+    for (col in col.names) {
+      if (!(col %in% input$mdea.outputs)) {
+        cols.in <- c(col, cols.in)
+      }
+    }
+    
+    if (input$orientation == "out" || input$dea.orientation == "out" 
+        || input$mdea.orientation == "out") {
+      cols.in <- c("Constant_1", cols.in)
+    }
+    
+    updateSelectInput(session, 'mdea.inputs', 'Select Input(s):', 
+                      cols.in, input$mdea.inputs)
+  })
+  
 
 })
