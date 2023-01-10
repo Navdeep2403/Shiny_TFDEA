@@ -9,14 +9,18 @@
 shinyServer(function(input, output, session) {
 
   # Loads external R files
-  source("R/server.vars.R", local=TRUE)$value # Variables used among reactive expressions and functions in server.R 
-  # source("R/tables.R", local=TRUE)$value      # Sortable datatables displaying data and results
+  source("R/server.vars.R", local=TRUE)$value # Variables used among reactive expressions and functions in server.R
   source("R/plots.R", local=TRUE)$value       # Plots displaying the results
   source("R/functions.R", local=TRUE)$value   # Functions used throughout the server code
-  # source("R/io.R", local=TRUE)$value          # Creates new inputs and download buttons using renderUI 
+  
+  # Un-comment after placing the code in files
+  #
+  # source("R/tables.R", local=TRUE)$value      # Sortable datatables displaying data and results
+  # source("R/io.R", local=TRUE)$value          # Creates new inputs and download buttons using renderUI
   
 
   # hide tabs in the side panel
+  hideTab("ts.setup", "ts.setup.model", session)
   hideTab("ts.setup", "ts.setup.tfdea_selection", session)
   hideTab("ts.setup", "ts.setup.dea_selection", session)
   hideTab("ts.setup", "ts.setup.mdea_selection", session)
@@ -31,8 +35,12 @@ shinyServer(function(input, output, session) {
   mdea_cols_list_input = list()
   mdea_cols_list_output = list()
   
+  # io.R - START
+  
+  # Updates the Frontier Date numericInput depending on the year of introduction
+  # column selected by the user
   output$frontier.date <- renderUI({
-
+    
     # Get data and the current intro date
     df <- get.df()
     intro.date <- get.intro.date() 
@@ -140,9 +148,11 @@ shinyServer(function(input, output, session) {
     },
     contentType = "application/vnd.ms-excel"
   )
+  # io.R - END
   
+  # Tables.R - START
   
-  
+  # Display uploaded data
   output$dt.data <- renderDataTable({
     
     df <- get.df()
@@ -193,7 +203,7 @@ shinyServer(function(input, output, session) {
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
                     paging = FALSE, info = FALSE))
   
-
+  
   # Display DEA efficiency results
   output$dt.dea.eff <- renderDataTable({
     df <- get.df()
@@ -206,7 +216,7 @@ shinyServer(function(input, output, session) {
     # renderDataTable does not show row names or numbers, so need to append both
     table <- cbind(seq(nrow(df)), DMU = rownames(table), Efficiency = table)
     colnames(table)<-c("DMU", "Efficiency")
-
+    
     return(table)
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
                     lengthMenu = c(10, 20, 30), pageLength = 10))
@@ -245,7 +255,7 @@ shinyServer(function(input, output, session) {
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
                     lengthMenu = c(10, 20, 30), pageLength = 10))
   
-
+  
   # mDEA - Start
   
   # Display mDEA efficiency results
@@ -356,7 +366,7 @@ shinyServer(function(input, output, session) {
     return(table)
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
                     lengthMenu = c(10, 20, 30), pageLength = 10))
-
+  
   # Display mDEA HCU Input
   output$dt.mdea.HCU_Input <- renderDataTable({
     df <- get.df()
@@ -428,7 +438,7 @@ shinyServer(function(input, output, session) {
   # mDEA - End
   
   
-    
+  
   # Display TFDEA forecast results
   output$dt.tfdea.forecast <- renderDataTable({
     df <- get.df()
@@ -510,6 +520,9 @@ shinyServer(function(input, output, session) {
   }, options = list(searching=FALSE, ordering=FALSE, processing=FALSE,
                     lengthMenu = c(10, 20, 30), pageLength = 10))
   
+  # Tables.R - END
+  
+  
   # Observers monitor when the action buttons are pressed or a reactive value changes
   
   # Observe the Display Data button. When pressed, upload the data from the specified location, display 
@@ -552,6 +565,7 @@ shinyServer(function(input, output, session) {
       })
       
       # Change the results tabset to display the data
+      showTab("ts.setup", "ts.setup.model", select = TRUE, session)
       updateTabsetPanel(session, "ts.result", selected = "ts.result.data")
     }
   }) # observe display
