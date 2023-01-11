@@ -113,18 +113,7 @@ shinyUI(pageWithSidebar(
                          actionButton("btn.mdeanext","Next")
                 ),
                 tabPanel("MultiplierDEA Weights", value = "ts.setup.mdea_weights",
-                         HTML("<h3>Inputs:</h3>"),
-                         HTML("<i><b>Note:</b> Columns having one or more values as zero(0) are skipped for weight restriction.</i><hr>"),
-                         uiOutput("mdea.pairs.input"),
-                         br(),
-                         br(),
-                         HTML("<h3>Outputs:</h3>"),
-                         HTML("<i><b>Note:</b> Columns having one or more values as zero(0) are skipped for weight restriction.</i><hr>"),
-                         uiOutput("mdea.pairs.output"),
-                         # selectInput('mdea.wr_num', 'Weight Restriction (Numerator):', 'NONE', multiple = TRUE),
-                         # selectInput('mdea.wr_denom', 'Weight Restriction (Denominator):', 'NONE', multiple = TRUE),
-                         # numericInput('mdea.wr_lb', 'Weight Restriction (Lower Bound):', 1, min = 1, max = 2),
-                         # numericInput('mdea.wr_ub', 'Weight Restriction (Upper Bound):', 2, min = 1, max = 2),
+                         uiOutput("mdea.pairs.weights"),
                          br(),
                          actionButton("btn.mdeaanalysis","Run MultiplierDEA Analysis")
                 )

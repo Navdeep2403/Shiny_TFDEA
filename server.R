@@ -650,95 +650,13 @@ shinyServer(function(input, output, session) {
         
         # Extracting columns with non-zero values
         columns_list_in<-c()
-
+        columns_list_out<-c()
+        
         for (x in input$mdea.inputs) {
           if(!(0 %in% df[[x]])) {
             columns_list_in <- c(columns_list_in, x)
           }
         }
-        
-        print("columns_list_in")
-        print(columns_list_in)
-        
-        if (length(columns_list_in) > 1) {
-
-          output$mdea.pairs.input <- renderUI({
-            slider_list = list()
-            
-            # columns_list<-input$mdea.inputs
-            
-            # min_lb = 0
-            # max_ub = 10000
-            # default_lb = 2000
-            # default_ub = 5000
-
-            k=1
-            for(x in columns_list_in) {
-              for(y in columns_list_in) {
-                if(x!=y) {
-                  print("x")
-                  print(x)
-                  
-                  print("y")
-                  print(y)
-
-                  min_lb = round(min(df[x])/max(df[y]) + 1, digits=2)
-                  max_ub = round(max(df[x])/min(df[y]) + 1, digits=2)
-
-                  default_lb = (min_lb + max_ub )/3
-                  default_ub = default_lb * 2
-  
-                  slider_list[k] = list(
-                    sliderInput(
-                      paste("mdea_weights", paste(x,y,sep="_"), sep = "__"), #InputID mdea_weights.column1_column2
-                      paste(x,y,sep=" - "), # Input label on UI
-                      min = min_lb,
-                      max = max_ub,
-                      value = c(default_lb,default_ub)
-                      ))
-  
-                  # slider_list[k+1] = list(
-                  #   textInput(
-                  #     inputId = paste("lower_mdea_weights", paste(x,y,sep="_"), sep = "__"),
-                  #     value = default_lb,
-                  #     label=NULL,
-                  #     placeholder = "Lower bound"
-                  #     ))
-                  # 
-                  # slider_list[k+2] = list(
-                  #   textInput(
-                  #     inputId = paste("upper_mdea_weights", paste(x,y,sep="_"), sep = "__"),
-                  #     value = default_ub,
-                  #     label=NULL,
-                  #     placeholder = "Upper bound"
-                  #     ))
-  
-                  # saving  InputID into a list for later access
-                  mdea_cols_list_input <<- append(mdea_cols_list_input, paste("mdea_weights", paste(x,y,sep="_"), sep = "__"))
-  
-                  # k=k+3
-                  k =k+1
-                }
-              }
-            }
-  
-            print("mdea_cols_list_input")
-            print(mdea_cols_list_input)
-  
-            return(slider_list)
-          })
-        }
-        else {
-          output$mdea.pairs.input <- renderText({ 
-            "In order to user Weight Distrbution, please choose atleast 2 'Non-Zero' Input columns, Otherwise Please ignore and Run the Analysis."
-          })
-        }
-        
-        
-        
-        
-        # Extracting columns with non-zero values
-        columns_list_out<-c()
         
         for (x in input$mdea.outputs) {
           if(!(0 %in% df[[x]])) {
@@ -746,19 +664,86 @@ shinyServer(function(input, output, session) {
           }
         }
         
-        if (length(columns_list_out) > 1) {
-          
-            output$mdea.pairs.output <- renderUI({
-              slider_list = list()
+        print("columns_list_in")
+        print(columns_list_in)
+        
+        print("columns_list_out")
+        print(columns_list_out)
+        
+        
+        if (length(columns_list_in) > 1 || length(columns_list_out) > 1) {
+
+          output$mdea.pairs.weights <- renderUI({
+            slider_list = list()
+            k=1
+            
+            slider_list[k] = list(HTML("<i><b>Note:</b> Columns having one or more values as zero(0) are skipped for weight restriction.</i><hr>"))
+            
+            if (length(columns_list_in) > 1) {
+
+                k=k+1
+                slider_list[k] = list(HTML("<h3>Inputs:</h3>"))
+                
+                k=k+1
+                for(x in columns_list_in) {
+                  for(y in columns_list_in) {
+                    if(x!=y) {
+                      min_lb = round(min(df[x])/max(df[y]) + 1, digits=2)
+                      max_ub = round(max(df[x])/min(df[y]) + 1, digits=2)
+    
+                      default_lb = (min_lb + max_ub )/3
+                      default_ub = default_lb * 2
+      
+                      # slider_list[k] = list(
+                      #   sliderInput(
+                      #     paste("mdea_weights", paste(x,y,sep="_"), sep = "__"), #InputID mdea_weights.column1_column2
+                      #     paste(x,y,sep=" - "), # Input label on UI
+                      #     min = min_lb,
+                      #     max = max_ub,
+                      #     value = c(default_lb,default_ub)
+                      #     ))
+                      
+                      slider_list[k] = list(HTML(paste("<h4>", paste(x,y,sep=" - "), "</h4>")))
+      
+                      slider_list[k+1] = list(
+                        textInput(
+                          inputId = paste("lower_bound", paste(x,y,sep="_"), sep = "__"),
+                          # value = 0,
+                          label="Lower bound",
+                          placeholder = "e.g. 0, 1, 2 etc."
+                          ))
+    
+                      slider_list[k+2] = list(
+                        textInput(
+                          inputId = paste("upper_bound", paste(x,y,sep="_"), sep = "__"),
+                          # value = Inf,
+                          label="Upper bound",
+                          placeholder = "e.g. 100, Inf, etc."
+                          ))
+      
+                      # saving  InputID into a list for later access
+                      mdea_cols_list_input <<- append(mdea_cols_list_input, paste(x,y,sep="_"))
+      
+                      k=k+3
+                    }
+                  }
+                }
+  
+                print("mdea_cols_list_input")
+                print(mdea_cols_list_input)
+            }
+            else {
+              k=k+1
+              slider_list[k] = list(HTML("In order to user Weight Distrbution, please choose atleast 2 'Non-Zero' Input columns, Otherwise Please ignore and Run the Analysis."))
+            }
+            
+            if (length(columns_list_out) > 1) {
               
-              # columns_list<-input$mdea.outputs
+              k=k+1
+              slider_list[k] = list(HTML("<h3>Outputs:</h3>"))
               
-              # min_lb = 0
-              # max_ub = 10000
-              # default_lb = 2000
-              # default_ub = 5000
+              k=k+1
               
-              k=1
               for(x in columns_list_out) {
                 for(y in columns_list_out) {
                   if(x!=y) {
@@ -769,37 +754,38 @@ shinyServer(function(input, output, session) {
                     default_lb = (min_lb + max_ub)/3   # 1/3rd of the slider
                     default_ub = default_lb * 2        # 2/3rd of the slider
                     
-                    slider_list[k] = list(
-                      sliderInput(
-                        paste("mdea_weights", paste(x,y,sep="_"), sep = "__"), #InputID mdea_weights.column1_column2
-                        paste(x,y,sep=" - "), # Input label on UI
-                        min = min_lb,
-                        max = max_ub,
-                        value = c(default_lb,default_ub)
+                    # slider_list[k] = list(
+                    #   sliderInput(
+                    #     paste("mdea_weights", paste(x,y,sep="_"), sep = "__"), #InputID mdea_weights.column1_column2
+                    #     paste(x,y,sep=" - "), # Input label on UI
+                    #     min = min_lb,
+                    #     max = max_ub,
+                    #     value = c(default_lb,default_ub)
+                    #   ))
+                    
+                    slider_list[k] = list(HTML(paste("<h4>", paste(x,y,sep=" - "), "</h4>")))
+                    
+                    slider_list[k+1] = list(
+                      textInput(
+                        inputId = paste("lower_bound", paste(x,y,sep="_"), sep = "__"),
+                        # value = 0,
+                        label="Lower bound",
+                        placeholder = "e.g. 0, 1, 2 etc."
                       ))
                     
-                    # slider_list[k+1] = list(
-                    #   textInput(
-                    #     inputId = paste("lower_mdea_weights", paste(x,y,sep="_"), sep = "__"),
-                    #     value = default_lb,
-                    #     label=NULL,
-                    #     placeholder = "Lower bound"
-                    #   ))
-                    # 
-                    # slider_list[k+2] = list(
-                    #   textInput(
-                    #     inputId = paste("upper_mdea_weights", paste(x,y,sep="_"), sep = "__"),
-                    #     value = default_ub,
-                    #     label=NULL,
-                    #     placeholder = "Upper bound"
-                    #   ))
+                    slider_list[k+2] = list(
+                      textInput(
+                        inputId = paste("upper_bound", paste(x,y,sep="_"), sep = "__"),
+                        # value = Inf,
+                        label="Upper bound",
+                        placeholder = "e.g. 100, Inf, etc."
+                      ))
                     
                     # saving  InputID into a list for later access
                     # mdea_cols_list_output <<- paste("mdea_weights", paste(x,y,sep="_"), sep = "__")
-                    mdea_cols_list_output <<- append(mdea_cols_list_output, paste("mdea_weights", paste(x,y,sep="_"), sep = "__"))
+                    mdea_cols_list_output <<- append(mdea_cols_list_output, paste(x,y,sep="_"))
                     
-                    # k=k+3
-                    k=k+1
+                    k=k+3
                   }
                 }
               }
@@ -807,32 +793,15 @@ shinyServer(function(input, output, session) {
               print("mdea_cols_list_output")
               print(mdea_cols_list_output)
               
-              return(slider_list)
-            })
-        } else {
-          output$mdea.pairs.output <- renderText({ 
-            "In order to user Weight Distrbution, please choose atleast 2 'Non-Zero' Output columns, Otherwise Please ignore and Run the Analysis."
+            }
+            else {
+              k=k+1
+              slider_list[k] = list(HTML("In order to user Weight Distrbution, please choose atleast 2 'Non-Zero' Output columns, Otherwise Please ignore and Run the Analysis."))
+            }
+  
+            return(slider_list)
           })
         }
-        
-        # for (item in mdea_cols_list) {
-        #   observeEvent(input[[item]], {
-        #     print("Inside loop: observeEvent: mdea")
-        #     
-        #     lb_item = paste0("lower_",item)
-        #     ub_item = paste0("upper_",item)
-        #     
-        #     if(input[[item]][1] != as.numeric(input[[lb_item]]) &&
-        #        input[[item]][2] != as.numeric(input[[ub_item]]))
-        #     {
-        #       updateSliderInput(
-        #         session = session,
-        #         inputId = item,
-        #         value = c(input[[lb_item]], input[[ub_item]])
-        #       )
-        #     }
-        #   })
-        # }
 
         # Find if any error occurred, and if so display
         error <- get.error()
@@ -926,40 +895,90 @@ shinyServer(function(input, output, session) {
               
               print(item)
     
-              split_item = strsplit(item,"__", fixed = TRUE)
-              split_cols = strsplit(split_item[[1]][2], "_")
+              # split_item = strsplit(item,"__", fixed = TRUE)
+              split_cols = strsplit(item, "_", fixed = TRUE)
+              lower_bound_id = paste("lower_bound", item, sep="__")
+              upper_bound_id = paste("upper_bound", item, sep="__")
               
-              print(paste("Adding numerator", split_cols[[1]][1]))
-              numerators <- c(numerators, split_cols[[1]][1])
+              print("lower_bound_id")
+              print(lower_bound_id)
+              print("upper_bound_id")
+              print(upper_bound_id)
               
-              print(paste("Adding denominator", split_cols[[1]][2]))
-              denominators <- c(denominators, split_cols[[1]][2])
-    
-              print(paste("Lower bound:", input[[item]][1]))
-              lower_bound <- c(lower_bound, input[[item]][1])
-              
-              print(paste("Upper bound:", input[[item]][2]))
-              upper_bound <- c(upper_bound, input[[item]][2])
+              # if both upper and lower are empty then skip adding numerator, 
+              # denominator, upper and lower bound altogether
+              if (input[[upper_bound_id]] != "" && input[[lower_bound_id]] != "") {
+                print(paste("Adding numerator", split_cols[[1]][1]))
+                numerators <- c(numerators, split_cols[[1]][1])
+                
+                print(paste("Adding denominator", split_cols[[1]][2]))
+                denominators <- c(denominators, split_cols[[1]][2])
+                
+                print(paste("Lower bound:", input[[lower_bound_id]]))
+                # if no lower bound is provided but upper bound is there 
+                # then assume 0 as lower bound
+                if (input[[lower_bound_id]] == "") {
+                  lower_bound <- c(lower_bound, 0)
+                }
+                else {
+                  lower_bound <- c(lower_bound, as.numeric(input[[lower_bound_id]]))
+                }
+                
+                print(paste("Upper bound:", input[[upper_bound_id]]))
+                # if no upper bound is provided but lower bound is there 
+                # then assume Inf as upper bound
+                if (input[[upper_bound_id]] == "") {
+                  upper_bound <- c(upper_bound, Inf)
+                }
+                else {
+                  upper_bound <- c(upper_bound, as.numeric(input[[upper_bound_id]]))
+                }
+                
+              }
             }
             
             print("Final Weight Restrcition: ")
+            print("input$mdea.inputs")
+            print(input$mdea.inputs)
+            print("input$mdea.outputs")
+            print(input$mdea.outputs)
+            print("numerators")
             print(numerators)
+            print("denominators")
             print(denominators)
+            print("lower_bound")
             print(lower_bound)
+            print("upper_bound")
             print(upper_bound)
             
-            weightRestriction<-data.frame(lower = lower_bound,
-                                          numerator = numerators,
-                                          denominator = denominators,
-                                          upper = upper_bound)
-    
-            # print(weightRestriction)
-            mdea <- mdea.analysis(session, df, input$mdea.inputs, input$mdea.outputs, input$rts, input$orientation, weightRestriction)
+            if (length(lower_bound) > 0 && length(upper_bound) == 0) {
+              weightRestriction<-data.frame(lower = lower_bound,
+                                            numerator = numerators,
+                                            denominator = denominators)
+            }
+            else if (length(lower_bound) == 0 && length(upper_bound) > 0) {
+              weightRestriction<-data.frame(numerator = numerators,
+                                            denominator = denominators,
+                                            upper = upper_bound)
+            } 
+            else {
+              weightRestriction<-data.frame(lower = lower_bound,
+                                            numerator = numerators,
+                                            denominator = denominators,
+                                            upper = upper_bound)
+            }
+
+            
+            if (length(lower_bound) > 0 || length(upper_bound) > 0) {
+              mdea <- mdea.analysis(session, df, input$mdea.inputs, input$mdea.outputs, input$rts, input$orientation, weightRestriction)
+            }
+            # if no weights are provided for column pairs, then run without weight restriction
+            else {
+              mdea <- mdea.analysis(session, df, input$mdea.inputs, input$mdea.outputs, input$rts, input$orientation)
+            }
         }
         else {
-
             mdea <- mdea.analysis(session, df, input$mdea.inputs, input$mdea.outputs, input$rts, input$orientation)
-          
         }
         # print("Inside MultiplierDEA Analysis")
         # print(mdea)
